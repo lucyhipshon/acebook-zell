@@ -21,9 +21,13 @@ It's recommended you all read the suggested docs _after making sure the whole
 setup below worked for everyone_. Then work together on a diagram describing how
 the application works.
 
-### Card wall
 
-REPLACE THIS TEXT WITH A LINK TO YOUR CARD WALL
+### Card wall
+[Team Zell Acebook Trello Board](https://trello.com/b/ydxIfr7Z/team-zell-acebook)
+
+![Trello Board Screenshot](https://github.com/user-attachments/assets/b1f91649-5999-4c56-b70b-93549aeff40d)
+
+
 
 ### Quickstart
 
