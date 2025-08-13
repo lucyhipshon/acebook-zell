@@ -1,6 +1,8 @@
 const User = require("../models/user");
 
 function create(req, res) {
+  console.log("signup data:", req.body);
+
   const email = req.body.email;
   const password = req.body.password;
 
