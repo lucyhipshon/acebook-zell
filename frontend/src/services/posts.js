@@ -6,6 +6,7 @@ export async function getPosts(token) {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
     },
   };
 
@@ -13,6 +14,27 @@ export async function getPosts(token) {
 
   if (response.status !== 200) {
     throw new Error("Unable to fetch posts");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function createPost(token, postData) {
+  const requestOptions = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`, //authenticates the user
+      "Content-Type": "application/json", // tells the server that we are sending JSON data
+    },
+
+    body: JSON.stringify(postData), // server expects JSON, but fetch needs a string --> so we convert js object to JSON string for the req body
+  };
+
+  const response = await fetch(`${BACKEND_URL}/posts`, requestOptions);
+
+  if (response.status !== 201) {
+    throw new Error("Unable to create posts");
   }
 
   const data = await response.json();
