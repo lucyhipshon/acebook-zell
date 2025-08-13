@@ -2,6 +2,7 @@ import createFetchMock from "vitest-fetch-mock";
 import { describe, expect, vi } from "vitest";
 
 import { getPosts } from "../../src/services/posts";
+import { createPost } from "../../src/services/posts";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -39,5 +40,27 @@ describe("posts service", () => {
         expect(err.message).toEqual("Unable to fetch posts");
       }
     });
+  });
+});
+
+describe("createPost", () => {
+  test("includes a token with it's request", async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({ message: "Post created", token: "newToken" }),
+      { status: 201 }
+    );
+
+    await createPost("testToken", { message: "hello world" });
+
+    // This is an array of the arguments that were last passed to fetch
+    const fetchArguments = fetch.mock.lastCall;
+    const url = fetchArguments[0];
+    const options = fetchArguments[1];
+
+    expect(url).toEqual(`${BACKEND_URL}/posts`);
+    expect(options.method).toEqual("POST");
+    expect(options.headers["Authorization"]).toEqual("Bearer testToken");
+    expect(options.headers["Content-Type"]).toEqual("application/json"); // Verifies the HTTP request sets the correct content type for JSON data
+    expect(options.body).toEqual(JSON.stringify({ message: "hello world" }));
   });
 });
