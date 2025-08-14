@@ -1,36 +1,51 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
-import { useNavigate } from "react-router-dom";
 import { signup } from "../../src/services/authentication";
-
 import { SignupPage } from "../../src/pages/Signup/SignupPage";
 
-// Mocking React Router's useNavigate function
-vi.mock("react-router-dom", () => {
-  const navigateMock = vi.fn();
-  const useNavigateMock = () => navigateMock; // Create a mock function for useNavigate
-  return { useNavigate: useNavigateMock };
-});
+// Mock react-slick carousel
+vi.mock("react-slick", () => ({
+  __esModule: true,
+  default: React.forwardRef((props, ref) => {
+    if (ref) {
+      ref.current = { slickGoTo: vi.fn() };
+    }
+    return <div>{props.children}</div>;
+  }),
+}));
 
-// Mocking the signup service
-vi.mock("../../src/services/authentication", () => {
-  const signupMock = vi.fn();
-  return { signup: signupMock };
-});
+vi.mock("slick-carousel/slick/slick.css", () => ({}));
+vi.mock("slick-carousel/slick/slick-theme.css", () => ({}));
 
-// Reusable function for filling out signup form
+// Mock React Router
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+  Link: ({ children, to }) => <a href={to}>{children}</a>,
+}));
+
+// Mock authentication service
+vi.mock("../../src/services/authentication", () => ({
+  signup: vi.fn(),
+}));
+
 async function completeSignupForm() {
   const user = userEvent.setup();
 
-  const emailInputEl = screen.getByLabelText("Email:");
-  const passwordInputEl = screen.getByLabelText("Password:");
-  const submitButtonEl = screen.getByRole("submit-button");
-
-  await user.type(emailInputEl, "test@email.com");
-  await user.type(passwordInputEl, "1234");
-  await user.click(submitButtonEl);
+  // Find and fill out the inputs using their specific placeholder text
+  await user.type(screen.getByPlaceholderText("First Name"), "Ross");
+  await user.type(screen.getByPlaceholderText("Last Name"), "Smith");
+  await user.type(screen.getByPlaceholderText("Email"), "test@email.com");
+  await user.type(screen.getByPlaceholderText("Password"), "1234");
+  await user.type(screen.getByPlaceholderText("Confirm Password"), "1234");
+  
+  // Submit the form
+  await user.click(screen.getByRole("button", { name: /submit/i }));
 }
 
 describe("Signup Page", () => {
@@ -38,32 +53,33 @@ describe("Signup Page", () => {
     vi.resetAllMocks();
   });
 
-  test("allows a user to signup", async () => {
+  test("renders signup form", () => {
     render(<SignupPage />);
+    
+    expect(screen.getByText("Create a new quack account")).toBeTruthy();
+    expect(screen.getAllByPlaceholderText("First Name")[0]).toBeTruthy();
+    expect(screen.getAllByPlaceholderText("Last Name")[0]).toBeTruthy();
+    expect(screen.getAllByPlaceholderText("Email")[0]).toBeTruthy();
+    expect(screen.getAllByPlaceholderText("Password")[0]).toBeTruthy();
+    expect(screen.getByRole("button", { name: /submit/i })).toBeTruthy();
+  });
 
+  test("submits form with valid data", async () => {
+    render(<SignupPage />);
     await completeSignupForm();
-
     expect(signup).toHaveBeenCalledWith("test@email.com", "1234");
   });
 
-  test("navigates to /login on successful signup", async () => {
+  test("navigates to login on success", async () => {
     render(<SignupPage />);
-
-    const navigateMock = useNavigate();
-
     await completeSignupForm();
-
-    expect(navigateMock).toHaveBeenCalledWith("/login");
+    expect(mockNavigate).toHaveBeenCalledWith("/login");
   });
 
-  test("navigates to /signup on unsuccessful signup", async () => {
+  test("navigates back to signup on failure", async () => {
+    signup.mockRejectedValue(new Error("Signup failed"));
     render(<SignupPage />);
-
-    signup.mockRejectedValue(new Error("Error signing up"));
-    const navigateMock = useNavigate();
-
     await completeSignupForm();
-
-    expect(navigateMock).toHaveBeenCalledWith("/signup");
+    expect(mockNavigate).toHaveBeenCalledWith("/signup");
   });
 });
