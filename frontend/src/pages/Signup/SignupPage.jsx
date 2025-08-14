@@ -141,11 +141,12 @@ export function SignupPage() {
   return (
     <div style={{
       position: "fixed",
-      top: 0,
-      left: 0,
+      top: 10,
+      left: 20,
       right: 0,
       bottom: 0,
       backgroundImage: "url('/rubber_duck_greet.gif')",
+      backgroundSize: "cover",
       backgroundPosition: "center",
       display: "flex",
       justifyContent: "center",
@@ -170,9 +171,10 @@ export function SignupPage() {
           <div>
               <div className="field is-grouped" style={{ marginBottom: "1rem" }}>
                 <div className="control is-expanded">
-                  <label className="label">First Name</label>
+                  <label className="label" htmlFor="firstName">First Name</label>
                   <div className="control has-icons-left">
                     <input 
+                      id="firstName"
                       className={`input is-link ${firstNameError ? 'is-danger' : ''}`}
                       type="text" 
                       placeholder="First Name" 
@@ -186,9 +188,10 @@ export function SignupPage() {
                   {firstNameError && <p className="help is-danger">{firstNameError}</p>}
                 </div>
                 <div className="control is-expanded">
-                  <label className="label">Last Name</label>
+                  <label className="label" htmlFor="lastName">Last Name</label>
                   <div className="control has-icons-left">
                     <input 
+                      id="lastName"
                       className={`input is-link ${lastNameError ? 'is-danger' : ''}`} 
                       type="text" 
                       placeholder="Last Name" 
@@ -243,7 +246,7 @@ export function SignupPage() {
                   <input
                     className={`input is-link ${confirmPasswordError ? 'is-danger' : ''}`}
                     type="password"
-                    placeholder="Password"
+                    placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={handleConfirmPasswordChange}
                     />
