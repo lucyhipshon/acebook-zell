@@ -11,7 +11,7 @@ import { CreatePostPage } from "./pages/CreatePost/CreatePostPage"
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: <LoginPage />,
   },
   {
     path: "/login",
