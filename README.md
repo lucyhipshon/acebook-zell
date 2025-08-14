@@ -21,13 +21,11 @@ It's recommended you all read the suggested docs _after making sure the whole
 setup below worked for everyone_. Then work together on a diagram describing how
 the application works.
 
-
 ### Card wall
+
 [Team Zell Acebook Trello Board](https://trello.com/b/ydxIfr7Z/team-zell-acebook)
 
 ![Trello Board Screenshot](https://github.com/user-attachments/assets/b1f91649-5999-4c56-b70b-93549aeff40d)
-
-
 
 ### Quickstart
 
@@ -125,3 +123,4 @@ Then, after signing up, you should be able to log in by going to
 
 After logging in, you won't see much but you can create posts using PostMan and
 they should then show up in the browser if you refresh the page.
+
