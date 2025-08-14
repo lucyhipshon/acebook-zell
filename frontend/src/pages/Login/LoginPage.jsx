@@ -34,7 +34,8 @@ export function LoginPage() {
       localStorage.setItem("token", token);
       navigate("/posts");
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
+      setSubmitError(err.message);
       navigate("/login");
     }
   }
@@ -55,7 +56,7 @@ export function LoginPage() {
       right: 0,
       bottom: 0,
       backgroundImage: "url('/rubber_duck_greet.gif')",
-      // backgroundSize: "cover",
+      backgroundSize: "cover",
       backgroundPosition: "center",
       display: "flex",
       justifyContent: "center",
@@ -68,6 +69,11 @@ export function LoginPage() {
         padding: "2rem",
       }}>
         <h1 className="title has-text-centered" style={{color: "#093FB4", fontSize: '5rem'}}>Log in</h1>
+        {submitError && (
+          <div className="notification is-danger" style={{ marginBottom: "1rem" }}>
+            {submitError}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="field">
             <p className="control has-icons-left has-icons-right">
