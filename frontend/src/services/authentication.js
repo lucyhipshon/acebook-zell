@@ -44,6 +44,8 @@ export async function signup(email, password) {
 
   let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
 
+  console.log(response);
+
   // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
   if (response.status === 201) {
     return;
