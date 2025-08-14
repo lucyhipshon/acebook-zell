@@ -145,12 +145,9 @@ export function SignupPage() {
       left: 20,
       right: 0,
       bottom: 0,
-        login_signup_tests
       backgroundImage: "url('/rubber_duck_greet.gif')",
       backgroundSize: "cover",
       backgroundPosition: "center",
-
-        main
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
