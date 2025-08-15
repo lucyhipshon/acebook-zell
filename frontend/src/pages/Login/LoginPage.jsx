@@ -63,7 +63,7 @@ export function LoginPage() {
       alignItems: "center",
       padding: "1rem"
     }}>
-       <div className="box" style={{ 
+      <div className="box" style={{ 
         width: "100%",
         maxWidth: "500px",
         padding: "2rem",
