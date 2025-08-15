@@ -13,7 +13,7 @@ export function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [birthdate, setBirthdate] = useState("");
+  const [birthdate, setBirthdate] = useState(""); ///????
   const [gender, setGender] = useState("");
   const [relationshipStatus, setRelationshipStatus] = useState("")
   const [job, setJob] = useState("");
@@ -68,8 +68,8 @@ export function SignupPage() {
     }
     
     try {
-      await signup(email, password);
-      navigate("/login");
+      await signup(email, password, firstName, lastName, bio, job, gender, birthdate, location, relationshipStatus);
+      navigate("/profile");
     } catch (err) {
       console.error(err);
       setSubmitError("Signup failed. Please try again.");
@@ -363,7 +363,7 @@ export function SignupPage() {
 
         <p className="has-text-centered" style={{ marginTop: "1rem" }}>
           <Link to="/login" className="has-text-link">
-            Have already an account?
+            Already have an account?
           </Link> 
         </p>
       </form>

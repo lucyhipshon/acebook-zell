@@ -31,10 +31,21 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(email, password) {
+
+
+// sign up 
+export async function signup(email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate) {
   const payload = {
-    email: email,
-    password: password,
+    email,
+    password,
+    firstName,
+    lastName,
+    bio,
+    job,
+    location,
+    gender,
+    relationshipStatus,
+    birthdate
   };
 
   const requestOptions = {
@@ -51,6 +62,9 @@ export async function signup(email, password) {
 
   // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
   if (response.status === 201) {
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    console.log("Saved token:", localStorage.getItem("token"));
     return;
   } else {
     throw new Error(
