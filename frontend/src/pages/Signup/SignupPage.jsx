@@ -72,7 +72,7 @@ export function SignupPage() {
       navigate("/login");
     } catch (err) {
       console.error(err);
-      setSubmitError("Signup failed. Please try again.");
+      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
       navigate("/signup");
     }
   }
@@ -141,8 +141,8 @@ export function SignupPage() {
   return (
     <div style={{
       position: "fixed",
-      top: 10,
-      left: 20,
+      top: 0,
+      left: 0,
       right: 0,
       bottom: 0,
       backgroundImage: "url('/rubber_duck_greet.gif')",
