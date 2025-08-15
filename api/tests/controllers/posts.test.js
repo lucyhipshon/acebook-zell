@@ -23,9 +23,11 @@ function createToken(userId) {
 }
 
 let token;
+let user;
+
 describe("/posts", () => {
   beforeAll(async () => {
-    const user = new User({
+    user = new User({
       email: "post-test@test.com",
       password: "12345678",
     });
@@ -57,6 +59,7 @@ describe("/posts", () => {
       const posts = await Post.find();
       expect(posts.length).toEqual(1);
       expect(posts[0].message).toEqual("Hello World!!");
+      expect(posts[0].author.toString()).toEqual(user._id.toString()); // ObjectId converted to string for comparison
     });
 
     test("returns a new token", async () => {
@@ -104,8 +107,14 @@ describe("/posts", () => {
 
   describe("GET, when token is present", () => {
     test("the response code is 200", async () => {
-      const post1 = new Post({ message: "I love all my children equally" });
-      const post2 = new Post({ message: "I've never cared for GOB" });
+      const post1 = new Post({
+        message: "I love all my children equally",
+        author: user._id,
+      });
+      const post2 = new Post({
+        message: "I've never cared for GOB",
+        author: user._id,
+      });
       await post1.save();
       await post2.save();
 
@@ -117,8 +126,8 @@ describe("/posts", () => {
     });
 
     test("returns every post in the collection", async () => {
-      const post1 = new Post({ message: "howdy!" });
-      const post2 = new Post({ message: "hola!" });
+      const post1 = new Post({ message: "howdy!", author: user._id });
+      const post2 = new Post({ message: "hola!", author: user._id });
       await post1.save();
       await post2.save();
 
@@ -135,8 +144,8 @@ describe("/posts", () => {
     });
 
     test("returns a new token", async () => {
-      const post1 = new Post({ message: "First Post!" });
-      const post2 = new Post({ message: "Second Post!" });
+      const post1 = new Post({ message: "First Post!", author: user._id });
+      const post2 = new Post({ message: "Second Post!", author: user._id });
       await post1.save();
       await post2.save();
 
@@ -155,8 +164,8 @@ describe("/posts", () => {
 
   describe("GET, when token is missing", () => {
     test("the response code is 401", async () => {
-      const post1 = new Post({ message: "howdy!" });
-      const post2 = new Post({ message: "hola!" });
+      const post1 = new Post({ message: "howdy!", author: user._id });
+      const post2 = new Post({ message: "hola!", author: user.id });
       await post1.save();
       await post2.save();
 
@@ -166,8 +175,8 @@ describe("/posts", () => {
     });
 
     test("returns no posts", async () => {
-      const post1 = new Post({ message: "howdy!" });
-      const post2 = new Post({ message: "hola!" });
+      const post1 = new Post({ message: "howdy!", author: user._id });
+      const post2 = new Post({ message: "hola!", author: user._id });
       await post1.save();
       await post2.save();
 
@@ -177,8 +186,8 @@ describe("/posts", () => {
     });
 
     test("does not return a new token", async () => {
-      const post1 = new Post({ message: "howdy!" });
-      const post2 = new Post({ message: "hola!" });
+      const post1 = new Post({ message: "howdy!", author: user._id });
+      const post2 = new Post({ message: "hola!", author: user._id });
       await post1.save();
       await post2.save();
 
