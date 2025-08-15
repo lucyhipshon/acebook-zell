@@ -32,7 +32,7 @@ export function FeedPage() {
   }
 
   return (
-    <>
+    <div style={{width: 1000}}>
       <Navbar/>
       <h2>Posts</h2>
       <div className="feed" role="feed">
@@ -40,6 +40,6 @@ export function FeedPage() {
           <Post post={post} key={post._id} />
         ))}
       </div>
-    </>
+    </div>
   );
 }

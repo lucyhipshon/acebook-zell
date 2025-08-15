@@ -1,33 +1,37 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
+import "./Navbar.css";
 
 export function Navbar() {
+    const { pathname } = useLocation();
+    const isFeed = pathname === "/posts" || pathname.startsWith("/posts/");
+    const isProfile = pathname === "/profile" || pathname.startsWith("/profile/");
+
     return (
-        <header>
-            <nav className="navbar is-light" role="navigation">
-                <div className="container">
-                    <div className="navbar-brand">
-                        <strong>Quackbook</strong>
-                    </div>
-
-                    <div className="navbar-menu">
-                        <div className="navbar-start">
-                        <Link to="/posts">
-                            Feed
-                        </Link>
-                        <Link to="/profile">
-                            Profile
-                        </Link>
-                        </div>
-
-                        <div className="navbar-end">
-                            <div className="navbar-item">
-                                <LogoutButton />
-                            </div>
-                        </div>
-                    </div>
+        <header className="nav">
+            <div className="nav-inner">
+                <div className="brand" aria-label="Quackbook">
+                    <img
+                        src="https://img2.annthegran.com/printart/xlarge/fsl_studio/pgfsl1771.webp"
+                        alt="Quackbook duck logo"
+                        className="logo"
+                    />
+                    <span className="name">Quackbook</span>
                 </div>
-            </nav>
+
+                <nav className="links" aria-label="Primary">
+                    <Link to="/posts" className={`nav-link ${isFeed ? "active" : ""}`}>
+                        Feed
+                    </Link>
+                    <Link to="/profile" className={`nav-link ${isProfile ? "active" : ""}`}>
+                        Profile
+                    </Link>
+                </nav>
+
+                <div className="right">
+                    <LogoutButton />
+                </div>
+            </div>
         </header>
-    )
+    );
 }
