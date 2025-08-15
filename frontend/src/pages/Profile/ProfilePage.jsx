@@ -44,7 +44,7 @@ const ProfilePage = () => {
       <h2>Welcome, {user.firstName}</h2>
       <p>{user.bio}</p>
       <img
-        src={`http://localhost:3000/${user.profileImage}`}
+        src={`http://localhost:3000${user.profileImage}`}
         alt="Profile"
         style={{ width: '150px', borderRadius: '50%' }}
       />

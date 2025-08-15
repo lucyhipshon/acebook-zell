@@ -16,7 +16,7 @@ function create(req, res) {
   const relationshipStatus = req.body.relationshipStatus;
   const birthdate = req.body.birthdate;
 
-  const profileImage = req.file? '/uploads/${req.file.filename}' : "uploads/default.jpg"; // default profile pic
+  const profileImage = req.file? `/uploads/${req.file.filename}` : "uploads/default.jpg"; // default profile pic
   const user = new User({ email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate, profileImage});
 
   user
