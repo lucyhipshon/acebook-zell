@@ -42,7 +42,7 @@ const ProfilePage = () => {
 
   // styling
   return (
-    <div>
+    <div style={{ paddingTop: '80px', textAlign: 'center' }}>
       <img
         src={`http://localhost:3000${user.profileImage}`}
         alt="Profile"
@@ -56,9 +56,9 @@ const ProfilePage = () => {
         }}
       />
 
-      <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+      <h4 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
         {user.firstName} {user.lastName}
-      </h2>
+      </h4>
 
       <p style={{ color: '#0b072fff' }}>{user.bio}</p>
     </div>
