@@ -10,7 +10,8 @@ export function CreatePostForm() {
 
     const maxLength = 200;
     const count = message.length
-    const isEmpty = message.length === 0
+    const trimmed = message.trim();
+    const isEmpty = trimmed.length === 0
 
     // Clear the error message as the user starts typing
     const handleChange = (e) => {
@@ -37,13 +38,13 @@ export function CreatePostForm() {
 
         try {
             // Call service function (needs token and message data - see function sig in service for context)
-            await createPost(token, {message: message});
+            await createPost(token, {message: trimmed});
             // Navigate to posts if successful
             navigate("/posts")
 
         } catch (err) {
             console.error(err) // for devs - error in browser console
-            setSubmitError("Failed to createpost. Please try again."); // for user - stay on the page and show the error
+            setSubmitError("Failed to create post. Please try again."); // for user - stay on the page and show the error
         }
 
 
@@ -53,8 +54,8 @@ export function CreatePostForm() {
     return (
         <form className="box" onSubmit={handleSubmit}>
             <div className="field">
-                <label className="label">
-                    Say Something... <span>({count}/{maxLength})</span>
+                <label className="label is-flex is-justify-content-space-between">
+                    New Post <span className="has-text-grey-light">({count}/{maxLength})</span>
                 </label>
                 <div className="control">
                     <textarea 
@@ -64,7 +65,8 @@ export function CreatePostForm() {
                         rows={5}
                         value={message}
                         onChange={handleChange}
-                        maxLength={200}
+                        maxLength={maxLength}
+                        placeholder="Say something..."
                     />
                 </div>
                 {/* Conditional error message: only shows if submitError has content */}
