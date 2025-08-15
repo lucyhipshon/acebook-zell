@@ -35,7 +35,7 @@ export function LoginPage() {
       navigate("/posts");
     } catch (err) {
       console.error(err.message);
-      setSubmitError(err.message);
+      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
       navigate("/login");
     }
   }
