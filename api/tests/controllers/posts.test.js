@@ -217,5 +217,16 @@ describe("/posts", () => {
         expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
       });
     })
+
+    describe("when token is missing", () => {
+      test("responds 401 and no token returned", async () => {
+        const p = await new Post({ message: "Will be blocked" }).save();
+
+        const res = await request(app).get(`/posts/${p._id}`);
+
+        expect(res.status).toEqual(401);
+        expect(res.body.token).toEqual(undefined);
+      });
+    });
   })
 });
