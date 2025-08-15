@@ -187,4 +187,35 @@ describe("/posts", () => {
       expect(response.body.token).toEqual(undefined);
     });
   });
+
+  describe("GET /posts/:id", () => {
+    describe("when token is present", () => {
+      test("responds 200 and returns the post", async () => {
+        const post = new Post({ message: "Hello, world!"});
+        await post.save();
+
+        const res = await request(app)
+          .get(`/posts/${post._id}`)
+          .set("Authorization", `Bearer ${token}`)
+
+        expect(res.status).toEqual(200);
+        expect(res.body.post._id).toEqual(post._id.toString());
+        expect(res.body.post.message).toEqual("Hello, world!");
+      })
+
+      test("returns a new token", async () => {
+        const post = await new Post({ message: "Token check"}).save();
+
+        const response = await request(app)
+          .get(`/posts/${post._id}`)
+          .set("Authorization", `Bearer ${token}`);
+
+        const newToken = response.body.token;
+        const newDecoded = JWT.decode(newToken, process.env.JWT_SECRET);
+        const oldDecoded = JWT.decode(token, process.env.JWT_SECRET);
+
+        expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
+      });
+    })
+  })
 });
