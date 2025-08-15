@@ -1,3 +1,4 @@
+const { generateToken } = require("../lib/token");
 const User = require("../models/user");
 
 async function create(req, res) {
@@ -36,8 +37,20 @@ async function create(req, res) {
     });
 }
 
+async function getAllUsers(req, res) {
+  try {
+    const users = await User.find();
+    const token = generateToken(req.user_id);
+    res.status(200).json({users: users, token: token});
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({message: "Something went wrong."});
+  }
+}
+
 const UsersController = {
   create: create,
+  getAllUsers: getAllUsers,
 };
 
 module.exports = UsersController;
