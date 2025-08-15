@@ -39,15 +39,28 @@ const ProfilePage = () => {
   if (loading) return <p>Loading profile...</p>;
   if (error) return <p>Error: {error}</p>;
 
+
+  // styling
   return (
     <div>
-      <h2>Welcome, {user.firstName}</h2>
-      <p>{user.bio}</p>
       <img
         src={`http://localhost:3000${user.profileImage}`}
         alt="Profile"
-        style={{ width: '150px', borderRadius: '50%' }}
+        style={{
+          width: '150px',
+          height: '150px',
+          objectFit: 'cover',
+          border: '2px solid #ccc',
+          marginBottom: '1rem',
+          borderRadius: '8px', // rounded edges
+        }}
       />
+
+      <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+        {user.firstName} {user.lastName}
+      </h2>
+
+      <p style={{ color: '#0b072fff' }}>{user.bio}</p>
     </div>
   );
 }

@@ -18,7 +18,7 @@ const tokenChecker = require('../middleware/tokenChecker');
 
 router.get('/profile', tokenChecker, async (req, res) => {
     try {
-        const user = await User.findById(req.user_id).select('firstname bio profileImage');
+        const user = await User.findById(req.user_id).select('firstName lastName bio profileImage '); // this is where to add db fields if needed in ProfilePage.jsx
         
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
