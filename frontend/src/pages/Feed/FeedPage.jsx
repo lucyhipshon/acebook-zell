@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getPosts } from "../../services/posts";
 import Post from "../../components/Post";
 import LogoutButton from "../../components/LogoutButton";
+import { Footer } from "../../components/Footer";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -40,6 +41,7 @@ export function FeedPage() {
         ))}
       </div>
       <LogoutButton />
+      <Footer/>
     </>
   );
 }
