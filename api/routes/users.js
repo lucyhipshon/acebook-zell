@@ -1,8 +1,10 @@
 const express = require("express");
-
+const router = express.Router();
+const upload = require("../middleware/uploads");
 const UsersController = require("../controllers/users");
 
-const router = express.Router();
+
+router.post("/", upload.single("profileImage"), UsersController.create); //images
 
 router.post("/", UsersController.create);
 
@@ -11,9 +13,12 @@ const User = require('../models/user');
 
 const tokenChecker = require('../middleware/tokenChecker'); 
 
+
+
+
 router.get('/profile', tokenChecker, async (req, res) => {
     try {
-        const user = await User.findById(req.user_id).select('firstname bio');
+        const user = await User.findById(req.user_id).select('firstname bio profileImage');
         
         if (!user) {
           return res.status(404).json({ message: 'User not found' });

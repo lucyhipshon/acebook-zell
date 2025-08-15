@@ -19,13 +19,14 @@ export function SignupPage() {
   const [job, setJob] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [profileImage, setProfileImage] = useState(null); // images
   const [firstNameError, setFirstNameError] = useState("");
   const [lastNameError, setLastNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [submitError, setSubmitError] = useState("");
+
   
   const navigate = useNavigate();
   const sliderRef = useRef();
@@ -68,7 +69,7 @@ export function SignupPage() {
     }
     
     try {
-      await signup(email, password, firstName, lastName, bio, job, gender, birthdate, location, relationshipStatus);
+      await signup(email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate, profileImage); 
       navigate("/profile");
     } catch (err) {
       console.error(err);
@@ -127,7 +128,7 @@ export function SignupPage() {
   }
 
   function handleFileChange(event) {
-    setProfilePicture(event.target.files[0]);
+    setProfileImage(event.target.files[0]);
   }
 
   const sliderSettings = {
@@ -334,7 +335,7 @@ export function SignupPage() {
                     </span>
                   </span>
                   <span className="file-name">
-                    {profilePicture ? profilePicture.name : "No file selected"}
+                    {profileImage ? profileImage.name : "No file selected"} 
                   </span>
                 </label>
               </div>

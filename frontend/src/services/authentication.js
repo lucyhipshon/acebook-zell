@@ -34,31 +34,37 @@ export async function login(email, password) {
 
 
 // sign up 
-export async function signup(email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate) {
-  const payload = {
-    email,
-    password,
-    firstName,
-    lastName,
-    bio,
-    job,
-    location,
-    gender,
-    relationshipStatus,
-    birthdate
-  };
+export async function signup(email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate, profileImage) {
+  const formData = new FormData();
 
-  const requestOptions = {
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("firstName", firstName);
+  formData.append("lastName", lastName);
+  formData.append("bio", bio);
+  formData.append("job", job);
+  formData.append("location", location);
+  formData.append("gender", gender);
+  formData.append("relationshipStatus", relationshipStatus);
+  formData.append("birthdate", birthdate);
+
+  if (profileImage) {
+    formData.append("profileImage", profileImage);
+  }
+
+  // const requestOptions = {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify(payload),
+  // };
+
+  const response = await fetch(`${BACKEND_URL}/users`, { 
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  };
+    body: formData, 
+  });
 
-  let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
-
-  console.log(response);
 
   // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
   if (response.status === 201) {
