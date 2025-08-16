@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const request = require("supertest");
 const JWT = require("jsonwebtoken");
 
@@ -217,6 +218,28 @@ describe("/posts", () => {
         expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
       });
     })
+
+    describe("error cases", () => {
+      test("400 when id format is invalid", async () => {
+        const res = await request(app)
+          .get("/posts/abc")
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(400);
+        expect(res.body.message).toEqual("Invalid post id");
+      });
+
+      test("404 when post does not exist", async () => {
+        const nonexistentId = new mongoose.Types.ObjectId().toString();
+
+        const res = await request(app)
+          .get(`/posts/${nonexistentId}`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(404);
+        expect(res.body.message).toEqual("Post not found");
+      });
+    });
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {

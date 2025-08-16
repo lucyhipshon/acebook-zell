@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Post = require("../models/post");
 const { generateToken } = require("../lib/token");
 
@@ -9,10 +10,18 @@ async function getAllPosts(req, res) {
 
 async function getPostById(req, res) {
   const {id} = req.params;
-  console.log("getPostById called with id =", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const token = generateToken(req.user_id);
+    return res.status(400).json({ message: "Invalid post id", token });
+  }
 
   const post = await Post.findById(id);
-  console.log("found post: ", post);
+
+  if (!post) {
+    const token = generateToken(req.user_id);
+    return res.status(404).json({ message: "Post not found", token });
+  }
 
   const newToken = generateToken(req.user_id);
   return res.status(200).json({post, token: newToken});
