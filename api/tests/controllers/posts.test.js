@@ -254,8 +254,7 @@ describe("/posts", () => {
   describe("GET /posts/:id", () => {
     describe("when token is present", () => {
       test("responds 200 and returns the post", async () => {
-        const post = await new Post({ message: "Hello, world!", author: user._id }).save();
-
+        const post = await new Post({ message: "Hello, world!", author: user._id}).save();
         const res = await request(app)
           .get(`/posts/${post._id}`)
           .set("Authorization", `Bearer ${token}`)
@@ -305,7 +304,7 @@ describe("/posts", () => {
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
         const post = await new Post({ message: "Will be blocked", author: user._id}).save();
-
+        
         const res = await request(app).get(`/posts/${post._id}`);
 
         expect(res.status).toEqual(401);
@@ -313,4 +312,66 @@ describe("/posts", () => {
       });
     });
   })
+
+  describe("DELETE /posts/:id", () => {
+    test("200: should delete the proper post and respond with a success message", async () => {
+      const postResponse = await request(app)
+        .post("/posts")
+        .set("Authorization", `Bearer ${token}`)
+        .send({message: "Test"});
+      
+      const postId = postResponse.body.post._id;
+
+      const res = await request(app)
+        .delete(`/posts/${postId}`)
+        .set("Authorization", `Bearer ${token}`);
+      
+        expect(res.status).toBe(200);
+        expect(res.body.message).toBe("Post deleted successfully.");
+    })
+
+  test("404: should not delete the post if post does not exist", async () => {
+      const invalidPostId = new mongoose.Types.ObjectId();
+
+      const res = await request(app)
+        .delete(`/posts/${invalidPostId}`)
+        .set("Authorization", `Bearer ${token}`)
+      
+        expect(res.status).toBe(404)
+        expect(res.body.message).toBe("Post not found.")
+    })
+
+    test("403: should not delete the post if it was created by anoter user", async () => {
+      const postResponse = await request(app)
+        .post("/posts")
+        .set("Authorization", `Bearer ${token}`)
+        .send({message: "Test"});
+      
+      const postId = postResponse.body.post._id;
+      const otherAuthor = await new User({
+        email: "otherAuthor@email.com", 
+        password: "12345678"
+      }).save();
+
+      const tokenOtherAuthor = createToken(otherAuthor._id)
+
+      const res = await request(app)
+        .delete(`/posts/${postId}`)
+        .set("Authorization", `Bearer ${tokenOtherAuthor}`)
+      
+        expect(res.status).toBe(403)
+        expect(res.body.message).toBe("Unable to delete the post. You can only delete your own posts.")
+    })
+
+    test("400: should return a 400 error if post_id is an invalid data type", async () => {
+      const res = await request(app)
+        .delete(`/posts/hello`)
+        .set("Authorization", `Bearer ${token}`)
+      
+        expect(res.status).toBe(400)
+        expect(res.body.message).toBe("Unable to delete the post. Invalid post id.")
+    })
+  })
 });
+
+

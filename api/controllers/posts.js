@@ -70,10 +70,34 @@ async function createPost(req, res) {
   }
 }
 
+async function deletePostById(req, res) {
+  const postId = req.params.id;
+  const userId = req.user_id;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      const token = generateToken(userId);
+      return res.status(400).json({ message: "Unable to delete the post. Invalid post id.", token})
+    }
+    const post = await Post.findOne({_id: postId});
+    if (!post) {
+      return res.status(404).json({message: "Post not found."})
+    }
+    if (userId !== post.author.toString()) {
+      return res.status(403).json({message: "Unable to delete the post. You can only delete your own posts."})
+    }
+    await Post.deleteOne({_id: postId})
+    return res.status(200).send({message: "Post deleted successfully."})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({message: "Something went wrong. Please try deleting the post again."});
+  }
+}
+
 const PostsController = {
   getAllPosts: getAllPosts,
   createPost: createPost,
   getPostById: getPostById,
+  deletePostById: deletePostById,
 };
 
 module.exports = PostsController;
