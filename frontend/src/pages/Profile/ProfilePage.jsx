@@ -25,7 +25,21 @@ const ProfilePage = () => {
 
         const data = await response.json();
         console.log('Fetched user data:', data);
-        setUser(data);
+
+        const BACKEND_URL = 'http://localhost:3000';
+
+        const profileImagePath = data.profileImage.startsWith('/')
+          ? data.profileImage
+          : '/' + data.profileImage;
+
+        setUser({
+          ...data,
+          profileImage: `${BACKEND_URL}${profileImagePath}`,
+        });
+
+        // for background image
+        setBackgroundImage(data.backgroundImage ? `http://localhost:3000${data.backgroundImage}` : null) // backgrounds
+      
       } catch (err) {
         console.error(err);
         setError(err.message || 'Something went wrong');
@@ -40,13 +54,44 @@ const ProfilePage = () => {
   if (loading) return <p>Loading profile...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  function handleBackgroundChange(event) {
+
+
+
+
+  // function handleBackgroundChange(event) {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const imageUrl = URL.createObjectURL(file);
+  //     setBackgroundImage(imageUrl);
+  //   }
+  // }
+
+  async function handleBackgroundChange(event) {
     const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setBackgroundImage(imageUrl);
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('backgroundImage', file);
+
+    try {
+      const response = await fetch(`http://localhost:3000/users/upload-background/${user._id}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const BACKEND_URL = 'http://localhost:3000';
+        setBackgroundImage(`${BACKEND_URL}${data.backgroundImage}`);
+      } else {
+        console.error('Upload failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Error uploading background image:', error);
     }
   }
+
 
   // styling
   return (
@@ -82,7 +127,7 @@ const ProfilePage = () => {
 
         {/* Profile image positioned at bottom center of banner */}
         <img
-          src={`http://localhost:3000${user.profileImage}`}
+          src={user.profileImage || 'http://localhost:3000/uploads/default.jpg'}
           alt="Profile"
           style={{
             width: '150px',

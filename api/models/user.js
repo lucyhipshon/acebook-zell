@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
   relationshipStatus: { type: String },
   birthdate: { type: String }, /// not sure which format to add birth date to mongodb
   gender: { type: String },
-  profileImage: { type: String }  //images
+  profileImage: { type: String },  //images
+  backgroundImage: { type: String, default: null } // background image for profile
 });
 
 const User = mongoose.model("User", UserSchema);
