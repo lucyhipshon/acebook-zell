@@ -36,7 +36,8 @@ return (
   <article key={props.post._id}>
     {/* Timestamp and author data */}
     <div style={{ color: '#66', fontSize: '14px', marginBottom: '4px' }}>
-        {props.post.author?.email || 'Unknown'} • {formatTimeAgo(props.post.createdAt)}
+      {/* Display author email, fallback to unkown if author doesn't exist / Bullet seprator for minimal visual sepration / Human readable time format */}
+        {props.post.author?.email || 'Unknown'} • {formatTimeAgo(props.post.createdAt)} 
     </div>
     {/* This is where the message body of the post is */}
     <div>
