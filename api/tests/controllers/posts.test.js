@@ -201,8 +201,7 @@ describe("/posts", () => {
   describe("GET /posts/:id", () => {
     describe("when token is present", () => {
       test("responds 200 and returns the post", async () => {
-        const post = new Post({ message: "Hello, world!"});
-        await post.save();
+        const post = await new Post({ message: "Hello, world!", author: user._id }).save();
 
         const res = await request(app)
           .get(`/posts/${post._id}`)
@@ -214,7 +213,7 @@ describe("/posts", () => {
       })
 
       test("returns a new token", async () => {
-        const post = await new Post({ message: "Token check"}).save();
+        const post = await new Post({ message: "Token check", author: user._id }).save();
 
         const response = await request(app)
           .get(`/posts/${post._id}`)
@@ -252,9 +251,9 @@ describe("/posts", () => {
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
-        const p = await new Post({ message: "Will be blocked" }).save();
+        const post = await new Post({ message: "Will be blocked", author: user._id}).save();
 
-        const res = await request(app).get(`/posts/${p._id}`);
+        const res = await request(app).get(`/posts/${post._id}`);
 
         expect(res.status).toEqual(401);
         expect(res.body.token).toEqual(undefined);
