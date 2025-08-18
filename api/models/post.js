@@ -11,6 +11,11 @@ const PostSchema = new mongoose.Schema(
       ref: "User", // pointing to the user model
       required: true,
     }, // every post must have an author
+    // NEW: Add image field
+    image: {
+      type: String, // storing image data as base64 encoded --> simple approach for first iteration - can migrate to more robust based on app scaling
+      required: false,
+    },
   },
 
   { timestamps: true } // Automatically adds createdAt and updatedAt fields

@@ -27,19 +27,16 @@ let token;
 let user;
 
 describe("/posts", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+    await Post.deleteMany({});
+
     user = new User({
       email: "post-test@test.com",
       password: "12345678",
     });
     await user.save();
-    await Post.deleteMany({});
     token = createToken(user.id);
-  });
-
-  afterEach(async () => {
-    await User.deleteMany({});
-    await Post.deleteMany({});
   });
 
   describe("POST, when a valid token is present", () => {
@@ -76,6 +73,37 @@ describe("/posts", () => {
 
       // iat stands for issued at
       expect(newTokenDecoded.iat > oldTokenDecoded.iat).toEqual(true);
+    });
+
+    test("creates a new post with image", async () => {
+      const imageData =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+      await request(app)
+        .post("/posts")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          message: "Hello World with image!",
+          image: imageData,
+        });
+
+      const posts = await Post.find();
+      expect(posts.length).toEqual(1);
+      expect(posts[0].message).toEqual("Hello World with image!");
+      expect(posts[0].image).toEqual(imageData);
+      expect(posts[0].author.toString()).toEqual(user._id.toString());
+    });
+
+    test("creates a post without image when image field is not provided", async () => {
+      await request(app)
+        .post("/posts")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ message: "Hello World without image!" });
+
+      const posts = await Post.find();
+      expect(posts.length).toEqual(1);
+      expect(posts[0].message).toEqual("Hello World without image!");
+      expect(posts[0].image).toBeUndefined();
     });
   });
 
@@ -161,6 +189,31 @@ describe("/posts", () => {
       // iat stands for issued at
       expect(newTokenDecoded.iat > oldTokenDecoded.iat).toEqual(true);
     });
+    test("returns posts with images", async () => {
+      const imageData =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+      const post1 = new Post({
+        message: "Post with image",
+        author: user._id,
+        image: imageData,
+      });
+      const post2 = new Post({
+        message: "Post without image",
+        author: user._id,
+      });
+      await post1.save();
+      await post2.save();
+
+      const response = await request(app)
+        .get("/posts")
+        .set("Authorization", `Bearer ${token}`);
+
+      const posts = response.body.posts;
+      expect(posts.length).toEqual(2);
+      expect(posts[0].image).toEqual(imageData);
+      expect(posts[1].image).toBeUndefined();
+    });
   });
 
   describe("GET, when token is missing", () => {
@@ -202,7 +255,6 @@ describe("/posts", () => {
     describe("when token is present", () => {
       test("responds 200 and returns the post", async () => {
         const post = await new Post({ message: "Hello, world!", author: user._id}).save();
-
         const res = await request(app)
           .get(`/posts/${post._id}`)
           .set("Authorization", `Bearer ${token}`)
@@ -213,7 +265,7 @@ describe("/posts", () => {
       })
 
       test("returns a new token", async () => {
-        const post = await new Post({ message: "Hello, world!", author: user._id}).save();
+        const post = await new Post({ message: "Token check", author: user._id }).save();
 
         const response = await request(app)
           .get(`/posts/${post._id}`)
@@ -251,8 +303,8 @@ describe("/posts", () => {
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
-        const post = await new Post({ message: "Hello, world!", author: user._id}).save();
-
+        const post = await new Post({ message: "Will be blocked", author: user._id}).save();
+        
         const res = await request(app).get(`/posts/${post._id}`);
 
         expect(res.status).toEqual(401);
