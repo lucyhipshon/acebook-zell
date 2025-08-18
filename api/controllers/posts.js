@@ -5,7 +5,6 @@ const { generateToken } = require("../lib/token");
 async function getAllPosts(req, res) {
   const posts = await Post.find().populate("author", "email"); // using email for now, dont want to add changes to the user schema that will affect work that other will be doing
   const token = generateToken(req.user_id);
-  console.log(posts)
   res.status(200).json({ posts: posts, token: token });
 }
 
