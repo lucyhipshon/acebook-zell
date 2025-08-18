@@ -28,6 +28,11 @@ async function createPost(req, res) {
       author: req.user_id, // this is coming from the token checker middleware
     };
 
+    // NEW: Add image of provided
+    if (req.body.image) {
+      postData.image = req.body.image;
+    }
+
     const post = new Post(postData);
     await post.save();
 
