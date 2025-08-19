@@ -4,11 +4,17 @@ import { describe, expect, vi } from "vitest";
 import { getPosts } from "../../src/services/posts";
 import { createPost } from "../../src/services/posts";
 import { getPostById } from "../../src/services/posts";
+import { likePost, unlikePost } from "../../src/services/posts";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 // Mock fetch function
 createFetchMock(vi).enableMocks();
+
+beforeEach(() => {
+  fetch.resetMocks && fetch.resetMocks();
+  vi.clearAllMocks();
+});
 
 describe("posts service", () => {
   describe("getPosts", () => {
@@ -92,6 +98,74 @@ describe("getPostById", () => {
       await getPostById("testToken", "bad-id");
     } catch (err) {
       expect(err.message).toEqual("Unable to fetch post");
+    }
+  });
+});
+
+describe("likePost", () => {
+  test("calls the correct URL with token and POST", async () => {
+    const token = "testToken";
+    const postId = "abc123";
+
+    fetch.mockResponseOnce(JSON.stringify({ post: { _id: postId }, token: "newToken" }), { status: 200 });
+
+    const result = await likePost(token, postId);
+
+    const [url, options] = fetch.mock.calls[0];
+      expect(url).toEqual(`${BACKEND_URL}/posts/${postId}/like`);
+      expect(options.method).toEqual("POST");
+      expect(options.headers.Authorization).toEqual(`Bearer ${token}`);
+      expect(options.headers["Content-type"]).toEqual("application/json");
+
+      expect(result.post._id).toEqual(postId);
+      expect(result.token).toEqual("newToken");
+  });
+
+  test("rejects with a error if the status is not 200", async () => {
+      const token = "badToken";
+      const postId = "abc123";
+
+      fetch.mockResponseOnce(JSON.stringify({ message: "Invalid post id" }), { status: 400 });
+
+      try {
+        await likePost(token, postId);
+        throw new Error("should not reach");
+      } catch (err) {
+        expect(err.message).toEqual("Unable to like post");
+      }
+  });
+})
+
+describe("unlikePost", () => {
+  test("calls the correct URL with token and DELETE", async () => {
+    const token = "testToken";
+    const postId = "abc123";
+
+    fetch.mockResponseOnce(JSON.stringify({ post: { _id: postId }, token: "newToken" }), { status: 200 });
+
+    const result = await unlikePost(token, postId);
+
+    const [url, options] = fetch.mock.calls[0];
+    expect(url).toEqual(`${BACKEND_URL}/posts/${postId}/like`);
+    expect(options.method).toEqual("DELETE");
+    expect(options.headers.Authorization).toEqual(`Bearer ${token}`);
+    expect(options.headers["Content-type"]).toEqual("application/json");
+
+    expect(result.post._id).toEqual(postId);
+    expect(result.token).toEqual("newToken");
+  });
+
+  test("rejects with an error if the status is not 200", async () => {
+    const token = "badToken";
+    const postId = "abc123";
+
+    fetch.mockResponseOnce(JSON.stringify({ message: "Invalid post id" }), { status: 400 });
+
+    try {
+      await unlikePost(token, postId);
+      throw new Error("should not reach");
+    } catch (err) {
+      expect(err.message).toEqual("Unable to unlike post");
     }
   });
 });
