@@ -59,3 +59,24 @@ export async function getPostById(token, id) {
   const data = await response.json();
   return data;
 }
+
+export async function deletePostById(token, id) {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+  try {
+
+  const response = await fetch(`${BACKEND_URL}/posts/${id}`, requestOptions);
+  const data = await response.json();
+  
+  if (response.status == 200) {
+    return data;
+  }
+} catch(error) {
+  throw new Error(error);
+}
+}
