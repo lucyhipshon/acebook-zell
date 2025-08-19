@@ -37,9 +37,9 @@ async function createPost(req, res) {
     }
 
     // Length validaition (matching frontend post requirement)
-    if (req.body.message.length > 200) {
+    if (req.body.message.length > 2000) {
       return res.status(400).json({
-        error: "message must be 200 characters or less",
+        error: "message must be 2000 characters or less",
       });
     }
 

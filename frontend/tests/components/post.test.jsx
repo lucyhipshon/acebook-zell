@@ -9,7 +9,6 @@ describe("Post", () => {
       message: "test message",
       author: {email: "test@example.com"},
       createdAt: new Date().toISOString()
-      
     };
 
     render(<Post post={testPost} />);
