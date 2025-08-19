@@ -68,9 +68,10 @@ describe("authentication service", () => {
       const testEmail = "test@testEmail.com";
       const testPassword = "12345678";
 
-      fetch.mockResponseOnce(JSON.stringify({
-        status: 201,
-      }));
+      fetch.mockResponseOnce(JSON.stringify(
+        {token: "fake-token"}),
+        {status: 201}
+      );
 
       await signup(testEmail, testPassword);
 
@@ -81,22 +82,29 @@ describe("authentication service", () => {
 
       expect(url).toEqual(`${BACKEND_URL}/users`);
       expect(options.method).toEqual("POST");
-      expect(options.body).toEqual(
-        JSON.stringify({ email: testEmail, password: testPassword })
-      );
-      expect(options.headers["Content-Type"]).toEqual("application/json");
+      expect(options.body).toBeInstanceOf(FormData);
+
+      const formDataEntries = {};
+      for (const [key, value] of options.body.entries()) {
+        formDataEntries[key] = value;
+      }
+
+      expect(formDataEntries.email).toEqual(testEmail);
+      expect(formDataEntries.password).toEqual(testPassword);
+      // code changed here to match formData in user schema
     });
 
     test("returns nothing if the signup request was a success", async () => {
       const testEmail = "test@testEmail.com";
       const testPassword = "12345678";
 
-      fetch.mockResponseOnce(JSON.stringify({
-        status: 201,
-      }));
+      fetch.mockResponseOnce(JSON.stringify(
+        {token: "fake-token"}),
+        {status: 201}
+      );
 
       const token = await signup(testEmail, testPassword);
-      expect(token).toEqual(undefined);
+      expect(token).toEqual({ token: "fake-token"});
     });
 
     test("throws an error if the request failed", async () => {
