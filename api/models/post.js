@@ -29,6 +29,7 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );
 
+// Mongoose virtual to get number of likes. Does not persist to database
 PostSchema.virtual("likesCount").get(function () {
   return Array.isArray(this.likes) ? this.likes.length : 0
 });
