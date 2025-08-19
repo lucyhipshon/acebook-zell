@@ -93,11 +93,75 @@ async function deletePostById(req, res) {
   }
 }
 
+async function likePost(req, res) {
+  const userId = req.user_id;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const token = generateToken(userId);
+    return res.status(400).json({ message: "Invalid post id", token });
+  }
+
+  // $addToSet is a mongodb update operator. This means it can only be added once
+  // { new: true } returns the updated document
+  const updated = await Post.findByIdAndUpdate( // <- Mongodb method
+    id, { $addToSet: { likes: userId } }, { new: true } 
+  );
+
+  if (!updated) {
+    const token = generateToken(userId);
+    return res.status(404).json({ message: "Post not found", token });
+  }
+
+  // create a per-user flag for whether they liked it (not stored in database)
+  const likedByCurrentUser = Array.isArray(updated.likes) // If the likes array contains the userId, likedByCurrentUser is true
+    ? updated.likes.some((u) => String(u) === String(userId)) 
+    : false;
+  
+  // spread updated.JSON() so virtuals like likesCount are included in the payload
+  const token = generateToken(userId);
+  return res.status(200).json({
+    post: {...updated.toJSON(), likedByCurrentUser },
+    token,
+  });
+}
+
+async function unlikePost(req, res) {
+  const userId = req.user_id;
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const token = generateToken(userId);
+    return res.status(400).json({ message: "Invalid post id", token });
+  }
+
+  const updated = await Post.findByIdAndUpdate(
+    id, { $pull: { likes: userId } }, { new: true } // <- Uses $pull to remove the userId form the array if it is present
+  );
+
+  if (!updated) {
+    const token = generateToken(userId);
+    return res.status(404).json({ message: "Post not found", token });
+  }
+
+  const likedByCurrentUser = Array.isArray(updated.likes)
+    ? updated.likes.some((u) => String(u) === String(userId)) 
+    : false;
+
+  const token = generateToken(userId);
+  return res.status(200).json({
+    post: {...updated.toJSON(), likedByCurrentUser },
+    token,
+  });
+}
+
 const PostsController = {
   getAllPosts: getAllPosts,
   createPost: createPost,
   getPostById: getPostById,
   deletePostById: deletePostById,
+  likePost: likePost,
+  unlikePost: unlikePost,
 };
 
 module.exports = PostsController;

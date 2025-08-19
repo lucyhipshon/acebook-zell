@@ -79,4 +79,28 @@ describe("Post model", () => {
     expect(posts[0].message).toEqual("post with image");
     expect(posts[0].image).toEqual(imageData);
   });
+
+  it("defaults likes to [] and likesCount to 0", () => {
+    const post = new Post({
+      message: "likes default test",
+      author: user._id,
+    });
+
+    expect(post.likes).toEqual([]);
+    expect(post.likesCount).toBe(0);
+  })
+
+  it("reflects likes length with likesCount", () => {
+    const anotherUserId = new User({ email: "guy@email.com", password: "password12345" })._id;
+
+    const post = new Post({
+      message: "with likes",
+      author: user._id,
+      likes: [user._id, anotherUserId],
+    });
+
+    expect(post.likesCount).toBe(2);
+  });
 });
+
+

@@ -372,6 +372,173 @@ describe("/posts", () => {
         expect(res.body.message).toBe("Unable to delete the post. Invalid post id.")
     })
   })
+
+  describe("POST post/:id/like", () => {
+    describe("when token is present", () => {
+      test("responds 200 and adds a like (likedByCurrentUser is true, likesCount is 1)", async () => {
+        const post = await new Post({ message: "hello", author: user._id }).save();
+
+        const res = await request(app)
+          .post(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(200);
+        expect(res.body.post._id).toEqual(post._id.toString())
+        expect(res.body.post.likesCount).toBe(1);
+        expect(res.body.post.likedByCurrentUser).toBe(true);
+      });
+
+      test("returns a new token", async () => {
+        const post = await new Post({ message: "token check", author: user._id }).save();
+
+        const response = await request(app)
+          .post(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        const newToken = response.body.token;
+        const newDecoded = JWT.decode(newToken, process.env.JWT_SECRET);
+        const oldDecoded = JWT.decode(token, process.env.JWT_SECRET);
+
+        expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
+      });
+
+      test("liking twice keeps count at 1", async () => {
+        const post = await new Post({ message: "only one like", author: user._id }).save();
+
+        await request(app)
+          .post(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        const res2 = await request(app)
+          .post(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res2.status).toEqual(200);
+        expect(res2.body.post.likesCount).toBe(1);
+        expect(res2.body.post.likedByCurrentUser).toBe(true);
+      });
+    });
+
+    describe("when token is missing", () => {
+      test("responds 401 and no token returned", async () => {
+        const post = await new Post({ message: "blocked", author: user._id }).save();
+
+        const res = await request(app).post(`/posts/${post._id}/like`);
+
+        expect(res.status).toEqual(401);
+        expect(res.body.token).toEqual(undefined);
+      });
+    })
+
+    describe("error cases", () => {
+      test("400 when id format is invalid", async () => {
+        const res = await request(app)
+          .post("/posts/abc/like")
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(400);
+        expect(res.body.message).toEqual("Invalid post id");
+        expect(res.body.token).toBeDefined();
+      });
+
+      test("404 when post does not exist", async () => {
+        const nonexistentId = new mongoose.Types.ObjectId().toString();
+
+        const res = await request(app)
+          .post(`/posts/${nonexistentId}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(404);
+        expect(res.body.message).toEqual("Post not found");
+        expect(res.body.token).toBeDefined();
+      });
+    })
+  });
+
+  describe("DELETE /posts/:id/like", () => {
+    describe("when token is present", () => {
+      test("responds 200 and removes the like (likedByCurrentUser is false, likesCount is 0)", async () => {
+        const post = await new Post({ message: "will unlike", author: user._id }).save();
+
+        await request(app)
+          .post(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        const res = await request(app)
+          .delete(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(200);
+        expect(res.body.post.likesCount).toBe(0);
+        expect(res.body.post.likedByCurrentUser).toBe(false);
+      });
+
+      test("unliking twice keeps count at 0", async () => {
+        const post = await new Post({ message: "double unlike", author: user._id }).save();
+
+        const res1 = await request(app)
+          .delete(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+        const res2 = await request(app)
+          .delete(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res1.status).toEqual(200);
+        expect(res2.status).toEqual(200);
+        expect(res2.body.post.likesCount).toBe(0);
+        expect(res2.body.post.likedByCurrentUser).toBe(false);
+      });
+
+      test("returns a new token", async () => {
+        const post = await new Post({ message: "unlike token", author: user._id }).save();
+
+        const response = await request(app)
+          .delete(`/posts/${post._id}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        const newToken = response.body.token;
+        const newDecoded = JWT.decode(newToken, process.env.JWT_SECRET);
+        const oldDecoded = JWT.decode(token, process.env.JWT_SECRET);
+
+        expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
+      });
+    })
+
+    describe("when token is missing", () => {
+      test("responds 401 and no token returned", async () => {
+        const post = await new Post({ message: "blocked unlike", author: user._id }).save();
+
+        const res = await request(app).delete(`/posts/${post._id}/like`);
+
+        expect(res.status).toEqual(401);
+        expect(res.body.token).toEqual(undefined);
+      });
+    });
+
+    describe("error cases", () => {
+      test("400 when id format is invalid", async () => {
+        const res = await request(app)
+          .delete("/posts/abc/like")
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(400);
+        expect(res.body.message).toEqual("Invalid post id");
+        expect(res.body.token).toBeDefined();
+      });
+
+      test("404 when post does not exist", async () => {
+        const nonexistentId = new mongoose.Types.ObjectId().toString();
+
+        const res = await request(app)
+          .delete(`/posts/${nonexistentId}/like`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(404);
+        expect(res.body.message).toEqual("Post not found");
+        expect(res.body.token).toBeDefined();
+      });
+    })
+  })
 });
 
 
