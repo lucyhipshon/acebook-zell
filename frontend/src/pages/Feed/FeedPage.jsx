@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { getPosts } from "../../services/posts";
 import Post from "../../components/Post";
+import LogoutButton from "../../components/LogoutButton";
+import { Footer } from "../../components/Footer";
 import { Navbar } from "../../components/Navbar";
 
 export function FeedPage() {
@@ -40,6 +42,8 @@ export function FeedPage() {
           <Post post={post} key={post._id} />
         ))}
       </div>
+      <LogoutButton />
+      <Footer/>
     </div>
   );
 }
