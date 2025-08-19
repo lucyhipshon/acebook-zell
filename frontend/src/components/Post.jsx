@@ -1,6 +1,3 @@
-import { Link } from "react-router-dom";
-
-
 function Post(props) {
 
   // Format time function for the created at timestamp
@@ -37,11 +34,7 @@ function Post(props) {
   // Update the jsx strucure props isn't just message - will need a div for the timestamp and the author info details 
 
 return (
-  <div className="card" key={props.post_id}>
-    <Link
-        to={`/posts/${props.post._id}`}
-        className="card-link"
-      >
+  <article className="card" key={props.post_id}>
     <div className="card-content">
       <div className="media">
         <div className="media-left">
@@ -81,10 +74,8 @@ return (
           </a>
       </nav>
     </div>
-    </Link>
-  </div>
+  </article>
 )
-
 }
 
 export default Post;

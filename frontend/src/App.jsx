@@ -5,7 +5,7 @@ import { LoginPage } from "./pages/Login/LoginPage";
 import { SignupPage } from "./pages/Signup/SignupPage";
 import { FeedPage } from "./pages/Feed/FeedPage";
 import { CreatePostPage } from "./pages/CreatePost/CreatePostPage"
-import { PostPage } from "./pages/Post/PostPage";
+
 
 // docs: https://reactrouter.com/en/main/start/overview
 const router = createBrowserRouter([
@@ -29,10 +29,6 @@ const router = createBrowserRouter([
     path: "/createpost",
     element: <CreatePostPage />
   },
-  {
-    path: "/posts/:id",
-    element: <PostPage />
-  }
 ]);
 
 function App() {
