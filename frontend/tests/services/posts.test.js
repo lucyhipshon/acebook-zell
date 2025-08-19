@@ -64,6 +64,43 @@ describe("createPost", () => {
     expect(options.headers["Content-Type"]).toEqual("application/json"); // Verifies the HTTP request sets the correct content type for JSON data
     expect(options.body).toEqual(JSON.stringify({ message: "hello world" }));
   });
+  test("sends image data when provided", async () => {
+    const imageData =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+    fetch.mockResponseOnce(
+      JSON.stringify({ message: "Post created", token: "newToken" }),
+      { status: 201 }
+    );
+
+    await createPost("testToken", {
+      message: "hello world",
+      image: imageData,
+    });
+
+    const fetchArguments = fetch.mock.lastCall;
+    const options = fetchArguments[1];
+    const sentData = JSON.parse(options.body);
+
+    expect(sentData.message).toEqual("hello world");
+    expect(sentData.image).toEqual(imageData);
+  });
+
+  test("works without image data", async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({ message: "Post created", token: "newToken" }),
+      { status: 201 }
+    );
+
+    await createPost("testToken", { message: "hello world" });
+
+    const fetchArguments = fetch.mock.lastCall;
+    const options = fetchArguments[1];
+    const sentData = JSON.parse(options.body);
+
+    expect(sentData.message).toEqual("hello world");
+    expect(sentData.image).toBeUndefined();
+  });
 });
 
 describe("getPostById", () => {

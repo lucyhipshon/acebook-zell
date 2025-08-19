@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 import { getPosts } from "../../services/posts";
 import Post from "../../components/Post";
-import {CreatePostForm} from "../../components/CreatePostForm"
+
+import {CreatePostForm} from "../../components/CreatePostForm";
+import LogoutButton from "../../components/LogoutButton";
+import { Footer } from "../../components/Footer";
 import { Navbar } from "../../components/Navbar";
 
 export function FeedPage() {
@@ -43,6 +46,8 @@ export function FeedPage() {
         )
         ))}
       </div>
+      <LogoutButton />
+      <Footer/>
     </div>
   );
 }

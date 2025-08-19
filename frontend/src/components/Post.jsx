@@ -74,6 +74,22 @@ return (
           </a>
       </nav>
     </div>
+
+    {/* Display image if exists */}
+    {props.post.image && (
+      <div style={{ marginTop: '8px' }}>
+        <img 
+          src={props.post.image} 
+          alt="Post attachment" 
+          style={{
+            maxWidth: '100%',
+            height: 'auto',
+            borderRadius: '8px',
+            border: '1px solid #ddd'
+          }}
+        />
+      </div>
+    )}
   </article>
 )
 }

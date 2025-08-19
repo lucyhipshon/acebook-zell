@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 
 // Parse JSON request bodies, made available on `req.body`
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "10mb" })); // Setting the request body size limit to 10 megabytes to allow large JSON payloads --> probably will require review/refactor for performance and to avoid DoS vulnerabilities
 
 // API Routes
 app.use("/users", usersRouter);
