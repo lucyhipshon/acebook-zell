@@ -5,6 +5,7 @@ import { getPosts } from "../../services/posts";
 import Post from "../../components/Post";
 import LogoutButton from "../../components/LogoutButton";
 import { Footer } from "../../components/Footer";
+import { Navbar } from "../../components/Navbar";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -33,7 +34,8 @@ export function FeedPage() {
   }
 
   return (
-    <>
+    <div style={{width: 1000}}>
+      <Navbar/>
       <h2>Posts</h2>
       <div className="feed" role="feed">
         {posts.map((post) => (
@@ -42,6 +44,6 @@ export function FeedPage() {
       </div>
       <LogoutButton />
       <Footer/>
-    </>
+    </div>
   );
 }

@@ -99,4 +99,16 @@ describe("/users", () => {
       expect(response.body.message).toBe("Password must be at least 8 characters.")
     });
   });
+
+  describe("GET, get all users.", () => {
+    test("response code is 200", async () => {
+      const response = await request(app).get("/users");
+      expect(response.statusCode).toBe(200);
+    });
+
+    test("response code is 404 if endpoint is invalid", async () => {
+      const response = await request(app).get("/userssss")
+      expect(response.statusCode).toBe(404);
+    })
+  });
 });
