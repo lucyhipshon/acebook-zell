@@ -6,6 +6,7 @@ const UsersController = require("../controllers/users");
 
 router.post("/", upload.single("profileImage"), UsersController.create); //images
 
+router.get("/", UsersController.getAllUsers);
 router.post("/", UsersController.create);
 
 

@@ -35,7 +35,7 @@ export function LoginPage() {
       navigate("/profile");
     } catch (err) {
       console.error(err.message);
-      setSubmitError(err.message);
+      setSubmitError(err.message || "An unexpected error occurred. Please try again.");
       navigate("/login");
     }
   }
@@ -49,26 +49,18 @@ export function LoginPage() {
   }
 
   return (
-    <div style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundImage: "url('/rubber_duck_greet.gif')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "1rem"
-    }}>
-       <div className="box" style={{ 
-        width: "100%",
-        maxWidth: "500px",
-        padding: "2rem",
-      }}>
-        <h1 className="title has-text-centered" style={{color: "#093FB4", fontSize: '5rem'}}>Log in</h1>
+    <div className="section">
+      <div className="container">
+        <div className="columns">
+        <div className="column is-half is-centered">
+          <figure className="image is-96x96-mobile is-128x128-tablet is-128x128-desktop">
+              <img className="is-rounded" src="/signup_rubberduck.gif" alt="rubber duck"/>
+            </figure>
+        <h1 className="has-text-centered has-text-link" style={{fontSize: "5rem", fontWeight: "bold"}}>QuackBook</h1>
+          </div>
+            <div className="column is-half is-centered is-7">
+              <div className="box my-6 mx-6">
+        <h1 className="title has-text-centered has-text-link" style={{fontSize: '5rem'}}>Log in</h1>
         {submitError && (
           <div className="notification is-danger" style={{ marginBottom: "1rem" }}>
             {submitError}
@@ -109,7 +101,7 @@ export function LoginPage() {
           </div>
           <div className="field">
             <p className="control">
-              <button className="button is-link is-fullwidth" style={{ backgroundColor: "#093FB4" }}>
+              <button className="button is-link is-fullwidth is-linked is-focused">
                 Log in
               </button>
             </p>
@@ -120,7 +112,10 @@ export function LoginPage() {
             </Link> 
             {' '}and join the Quack community!</p>
         </form>
+        </div>
       </div>      
+    </div>
+    </div>
     </div>
   );
 }

@@ -41,8 +41,8 @@ async function completeSignupForm() {
   await user.type(screen.getByPlaceholderText("First Name"), "Ross");
   await user.type(screen.getByPlaceholderText("Last Name"), "Smith");
   await user.type(screen.getByPlaceholderText("Email"), "test@email.com");
-  await user.type(screen.getByPlaceholderText("Password"), "1234");
-  await user.type(screen.getByPlaceholderText("Confirm Password"), "1234");
+  await user.type(screen.getByPlaceholderText("Password"), "password1234");
+  await user.type(screen.getByPlaceholderText("Confirm Password"), "password1234");
   
   // Submit the form
   await user.click(screen.getByRole("button", { name: /submit/i }));
@@ -67,13 +67,25 @@ describe("Signup Page", () => {
   test("submits form with valid data", async () => {
     render(<SignupPage />);
     await completeSignupForm();
-    expect(signup).toHaveBeenCalledWith("test@email.com", "1234");
+    expect(signup).toHaveBeenCalledWith(
+      "test@email.com",
+      "password1234",
+      "Ross",
+      "Smith",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      null
+    );
   });
 
   test("navigates to login on success", async () => {
     render(<SignupPage />);
     await completeSignupForm();
-    expect(mockNavigate).toHaveBeenCalledWith("/login");
+    expect(mockNavigate).toHaveBeenCalledWith("/profile"); //changed here
   });
 
   test("navigates back to signup on failure", async () => {

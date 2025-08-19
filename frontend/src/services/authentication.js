@@ -62,7 +62,7 @@ export async function signup(email, password, firstName, lastName, bio, job, loc
 
   const response = await fetch(`${BACKEND_URL}/users`, { 
     method: "POST",
-    body: formData, 
+    body: formData,  // for image uploads, has to be formData
   });
 
 
@@ -71,7 +71,7 @@ export async function signup(email, password, firstName, lastName, bio, job, loc
     const data = await response.json();
     localStorage.setItem("token", data.token);
     console.log("Saved token:", localStorage.getItem("token"));
-    return;
+    return data;
   } else {
     throw new Error(
       `Received status ${response.status} when signing up. Expected 201`
