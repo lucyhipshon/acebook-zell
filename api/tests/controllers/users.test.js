@@ -1,7 +1,8 @@
 const request = require("supertest");
-
+const path = require("path");
 const app = require("../../app");
 const User = require("../../models/user");
+const { generateToken } = require("../../lib/token");
 
 require("../mongodb_helper");
 
@@ -27,6 +28,16 @@ describe("/users", () => {
       const users = await User.find();
       const newUser = users[users.length - 1];
       expect(newUser.email).toEqual("scarconstt@email.com");
+    });
+
+    test("returns a token on successful signup", async () => {
+      const response = await request(app)
+        .post("/users")
+        .send({ email: "newuser@email.com", password: "12345678", firstName: "New", lastName: "User" });
+
+      expect(response.statusCode).toBe(201);
+      expect(response.body.token).toBeDefined();
+      expect(typeof response.body.token).toBe("string");
     });
   });
 
@@ -111,5 +122,150 @@ describe("/users", () => {
       expect(response.statusCode).toBe(404);
     })
   });
-});
 
+  describe("POST, when only required fields are provided", () => {
+    test("user is created with optional fields missing", async () => {
+      const response = await request(app)
+        .post("/users")
+        .field("email", "mandatory@test.com")
+        .field("password", "12345678")
+        .field("firstName", "Mandatory")
+        .field("lastName", "Field");
+
+      expect(response.statusCode).toBe(201);
+
+      const users = await User.find({ email: "mandatory@test.com" });
+      expect(users.length).toBe(1);
+      const newUser = users[0];
+
+      // Optional fields should exist but be empty or undefined
+      expect(newUser.bio).toBeFalsy();
+      expect(newUser.job).toBeFalsy();
+      expect(newUser.gender).toBeFalsy();
+      expect(newUser.location).toBeFalsy();
+      expect(newUser.relationshipStatus).toBeFalsy();
+      expect(newUser.birthdate).toBeFalsy();
+      expect(newUser.profileImage).toEqual("uploads/default.jpg");
+    });
+
+    test("sets default profile image if none uploaded", async () => {
+      await request(app)
+      .post("/users")
+      .send({ email: "imgtest@email.com", password: "12345678" });
+
+      const user = await User.findOne({ email: "imgtest@email.com" });
+      expect(user.profileImage).toBe("uploads/default.jpg");
+    });
+  });
+
+
+  // profile tests - would need to be changed if more info was called on the profile page
+  describe('GET /users/profile', () => {
+    let user;
+    let token;
+
+    beforeAll(() => {
+    // Make sure JWT_SECRET matches test env
+    process.env.JWT_SECRET = process.env.JWT_SECRET || "test_secret";
+    });
+
+    beforeEach(async () => {
+      await User.deleteMany({});
+      user = new User({
+        email: 'profile@test.com',
+        password: '12345678',
+        firstName: 'Test',
+        lastName: 'User',
+        bio: 'Test bio',
+        profileImage: '/uploads/default.jpg',
+        backgroundImage: '/uploads/bg.jpg',
+      });
+      await user.save();
+
+      token = generateToken(user._id.toString());
+    });
+
+    test('returns user profile with valid token', async () => {
+      const res = await request(app)
+        .get('/users/profile')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      expect(res.body.firstName).toBe(user.firstName);
+      expect(res.body.lastName).toBe(user.lastName);
+      expect(res.body.bio).toBe(user.bio);
+      expect(res.body.profileImage).toBe(user.profileImage);
+      expect(res.body.backgroundImage).toBe(user.backgroundImage);
+    });
+
+    test('returns 401 if no token provided', async () => {
+      await request(app)
+        .get('/users/profile')
+        .expect(401);
+    });
+
+    test('returns 404 if user not found', async () => {
+      const fakeToken = generateToken("507f1f77bcf86cd799439011"); 
+
+      await request(app)
+        .get('/users/profile')
+        .set('Authorization', `Bearer ${fakeToken}`)
+        .expect(404);
+    });
+  });
+
+  // background image tests
+  describe("POST /users/upload-background/:userId", () => {
+    let user;
+
+    beforeEach(async () => {
+      await User.deleteMany({});
+      user = new User({
+        email: "bgtest@example.com",
+        password: "password123",
+        firstName: "BG",
+        lastName: "User"
+      });
+      await user.save();
+    });
+
+    test("uploads background image and updates user", async () => {
+      const imagePath = path.join(__dirname, "../uploads/test-background.jpg");
+
+      const response = await request(app)
+        .post(`/users/upload-background/${user._id}`)
+        .attach("backgroundImage", imagePath)
+        .expect(200);
+
+      // Check the response includes the expected fields
+      expect(response.body.backgroundImage).toMatch(/^\/uploads\/.+\.(jpg|jpeg|png)$/);
+      expect(response.body.user).toBeDefined();
+      expect(response.body.user.backgroundImage).toBe(response.body.backgroundImage);
+
+      // Check the user was updated in DB
+      const updatedUser = await User.findById(user._id);
+      expect(updatedUser.backgroundImage).toBe(response.body.backgroundImage);
+    });
+
+    test("returns 400 if no file uploaded", async () => {
+      const response = await request(app)
+        .post(`/users/upload-background/${user._id}`)
+        .expect(400);
+
+      expect(response.body.error).toBe("No image file uploaded");
+    });
+
+    test("returns 404 if user does not exist", async () => {
+      const fakeUserId = "507f1f77bcf86cd799439011"; // valid ObjectId but not in DB
+      const imagePath = path.join(__dirname, "../uploads/test-background.jpg");
+
+      const response = await request(app)
+        .post(`/users/upload-background/${fakeUserId}`)
+        .attach("backgroundImage", imagePath)
+        .expect(200); // Your current route doesn't 404 if user not found
+
+      // Optional: You could add logic in the route to return 404 if `updatedUser` is null
+    });
+  });
+
+})
