@@ -96,6 +96,7 @@ export async function unlikePost(token, id) {
 
   const data = await response.json();
   return data;
+}
   
  
   export async function deletePostById(token, id) {
@@ -118,3 +119,4 @@ export async function unlikePost(token, id) {
   throw new Error(error);
 }
 }
+
