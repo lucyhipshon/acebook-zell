@@ -68,9 +68,9 @@ describe("authentication service", () => {
       const testEmail = "test@testEmail.com";
       const testPassword = "12345678";
 
-      fetch.mockResponseOnce("", {
+      fetch.mockResponseOnce(JSON.stringify({
         status: 201,
-      });
+      }));
 
       await signup(testEmail, testPassword);
 
@@ -91,9 +91,9 @@ describe("authentication service", () => {
       const testEmail = "test@testEmail.com";
       const testPassword = "12345678";
 
-      fetch.mockResponseOnce(JSON.stringify(""), {
+      fetch.mockResponseOnce(JSON.stringify({
         status: 201,
-      });
+      }));
 
       const token = await signup(testEmail, testPassword);
       expect(token).toEqual(undefined);

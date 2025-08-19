@@ -40,3 +40,22 @@ export async function createPost(token, postData) {
   const data = await response.json();
   return data;
 }
+
+export async function getPostById(token, id) {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+
+  const response = await fetch(`${BACKEND_URL}/posts/${id}`, requestOptions);
+
+  if (response.status !== 200) {
+    throw new Error("Unable to fetch post");
+  }
+
+  const data = await response.json();
+  return data;
+}
