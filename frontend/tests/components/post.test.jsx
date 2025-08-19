@@ -1,22 +1,26 @@
 import { render, screen } from "@testing-library/react";
-
+import { MemoryRouter } from "react-router-dom";
 import Post from "../../src/components/Post";
 
 describe("Post", () => {
-  test("displays the message as an article", () => {
+  test("displays the message as a card", () => {
     const testPost = {
       _id: "123",
       message: "test message",
-      author: {email: "test@example.com"},
-      createdAt: new Date().toISOString()
-      
+      author: { email: "test@example.com" },
+      createdAt: new Date().toISOString(),
     };
 
-    render(<Post post={testPost} />);
+    render(
+      <MemoryRouter> 
+        <Post post={testPost} />
+      </MemoryRouter>
+    );
 
-    const article = screen.getByRole("article");
-    expect(article.textContent).toContain("test message");
-    expect(article.textContent).toContain("test@example.com");
-    expect(article.textContent).toContain("just now");  
+    const cardElement = screen.getByText("test message").closest(".card");
+    expect(cardElement).toBeInTheDocument();
+    expect(cardElement).toHaveTextContent("test message");
+    expect(cardElement).toHaveTextContent("test@example.com");
+    expect(cardElement).toHaveTextContent("just now");
   });
 });

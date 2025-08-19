@@ -2,13 +2,13 @@ import { useState } from "react";
 import {useNavigate} from "react-router-dom" 
 import { createPost } from "../services/posts";
 
-export function CreatePostForm() {
+export function CreatePostForm(props) {
 
     const [message, setMessage] = useState("");
     const [submitError, setSubmitError] = useState("");
     const navigate = useNavigate();
 
-    const maxLength = 200;
+    const maxLength = 2000;
     const count = message.length
     const trimmed = message.trim();
     const isEmpty = trimmed.length === 0
@@ -39,16 +39,14 @@ export function CreatePostForm() {
         try {
             // Call service function (needs token and message data - see function sig in service for context)
             await createPost(token, {message: trimmed});
-            // Navigate to posts if successful
+            props.onPostCreated(message)
             navigate("/posts")
+            setMessage("") //clear the form for the feed page after submitting
 
         } catch (err) {
             console.error(err) // for devs - error in browser console
             setSubmitError("Failed to create post. Please try again."); // for user - stay on the page and show the error
         }
-
-
-
     }
 
     return (
