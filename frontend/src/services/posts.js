@@ -59,3 +59,64 @@ export async function getPostById(token, id) {
   const data = await response.json();
   return data;
 }
+
+export async function likePost(token, id) {
+  const requestOptions = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+
+  const response = await fetch(`${BACKEND_URL}/posts/${id}/like`, requestOptions);
+
+  if (response.status !== 200) {
+    throw new Error("Unable to like post");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+export async function unlikePost(token, id) {
+  const requestOptions = {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+
+  const response = await fetch(`${BACKEND_URL}/posts/${id}/like`, requestOptions);
+
+  if (response.status !== 200) {
+    throw new Error("Unable to unlike post");
+  }
+
+  const data = await response.json();
+  return data;
+}
+  
+ 
+  export async function deletePostById(token, id) {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+  try {
+
+  const response = await fetch(`${BACKEND_URL}/posts/${id}`, requestOptions);
+  const data = await response.json();
+  
+  if (response.status == 200) {
+    return data;
+  }
+} catch(error) {
+  throw new Error(error);
+}
+}
+

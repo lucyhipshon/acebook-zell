@@ -30,18 +30,49 @@ function Post(props) {
 
 
 
+
   // Update the jsx strucure props isn't just message - will need a div for the timestamp and the author info details 
 
 return (
-  <article key={props.post._id}>
-    {/* Timestamp and author data */}
-    <div style={{ color: '#66', fontSize: '14px', marginBottom: '4px' }}>
-    {/* Display author email, fallback to unkown if author doesn't exist / Bullet seprator for minimal visual sepration / Human readable time format */}
-        {props.post.author?.email || 'Unknown'} • {formatTimeAgo(props.post.createdAt)}
+  <article className="card" key={props.post_id}>
+    <div className="card-content">
+      <div className="media">
+        <div className="media-left">
+          <figure className="image is-48x48">
+            <img src="/rubber_duck.jpg" alt={`Image for ${props.author}`}/>
+          </figure>
+        </div>
+        <div className="media-content">
+            <p className="title is-4 has-text-left">{props.post.author?.email || 'Unknown'}</p>
+            <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
+        </div>
     </div>
-    {/* This is where the message body of the post is */}
-    <div>
-      {props.post.message}
+
+    <div className="content has-text-left">
+      <p className="has-text-black hover-text-primary has-text-weight-normal">{props.post.message}</p>
+      <br />
+
+    </div>
+    {props.post.image &&(
+    <div className="card-image">
+      <figure className="image is-4by3">
+        <img src={props.post.image} alt={`Image for ${props.image}`}/>
+      </figure> 
+
+    </div>
+    )}
+    <nav className="level is-pulled-right">
+          <a className="level-item is-pulled-right" aria-label="reply">
+            <span className="icon is-small">
+              <i className="fa-solid fa-comment" aria-hidden="true"></i>
+            </span>
+          </a>
+          <a className="level-item" aria-label="like">
+            <span className="icon is-small">
+              <i className="fas fa-heart" aria-hidden="true"></i>
+            </span>
+          </a>
+      </nav>
     </div>
 
     {/* Display image if exists */}
@@ -61,7 +92,6 @@ return (
     )}
   </article>
 )
-
 }
 
 export default Post;
