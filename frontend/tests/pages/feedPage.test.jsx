@@ -33,10 +33,16 @@ describe("Feed Page", () => {
     const mockPosts = [{
       _id: "12345",
       message: "Test Post 1",
-      author: { _id: "u1", username: "alice", email: "alice@example.com" },
+      author: { 
+        _id: "u1", 
+        email: "alice@example.com",
+        firstName: "Alice",        
+        lastName: "Smith"          
+      },
       createdAt: "2025-08-11T16:36:15.000Z",
-      updatedAt: "2025-08-11T16:36:15.000Z",
-    }];
+      updatedAt: "2025-08-11T16:36:15.000Z",  
+
+  }];
 
     getPosts.mockResolvedValue({ posts: mockPosts, token: "newToken" });
 
