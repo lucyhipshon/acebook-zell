@@ -67,11 +67,13 @@ export async function signup(email, password, firstName, lastName, bio, job, loc
 
 
   // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
+  const data = await response.json();
   if (response.status === 201) {
-    const data = await response.json();
     localStorage.setItem("token", data.token);
     console.log("Saved token:", localStorage.getItem("token"));
     return data;
+  } else if (response.status === 400) {
+    throw new Error(data.message);
   } else {
     throw new Error(
       `Received status ${response.status} when signing up. Expected 201`

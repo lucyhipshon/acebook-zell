@@ -7,7 +7,6 @@ export function CreatePostPage() {
     return (
         <>
             <Navbar/>
-            <h2>Create a post</h2>
             <CreatePostForm onPostCreated={() => navigate("/posts")}/>
         </>
     )

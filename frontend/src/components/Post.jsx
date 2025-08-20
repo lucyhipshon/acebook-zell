@@ -53,14 +53,6 @@ return (
       <br />
 
     </div>
-    {props.post.image &&(
-    <div className="card-image">
-      <figure className="image is-4by3">
-        <img src={props.post.image} alt={`Image for ${props.image}`}/>
-      </figure> 
-
-    </div>
-    )}
     <nav className="level is-pulled-right">
           <a className="level-item is-pulled-right" aria-label="reply">
             <span className="icon is-small">
