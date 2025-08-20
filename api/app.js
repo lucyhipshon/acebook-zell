@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 const usersRouter = require("./routes/users");
 const postsRouter = require("./routes/posts");
@@ -23,6 +24,7 @@ app.use("/users", usersRouter);
 app.use("/posts", tokenChecker, postsRouter);
 app.use("/comments", tokenChecker, commentsRouter);
 app.use("/tokens", authenticationRouter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // image handling
 
 // 404 Handler
 app.use((_req, res) => {

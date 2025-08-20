@@ -31,31 +31,50 @@ export async function login(email, password) {
   }
 }
 
-export async function signup(email, password) {
-  const payload = {
-    email: email,
-    password: password,
-  };
 
-  const requestOptions = {
+
+// sign up 
+export async function signup(email, password, firstName, lastName, bio, job, location, gender, relationshipStatus, birthdate, profileImage) {
+  const formData = new FormData();
+
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("firstName", firstName);
+  formData.append("lastName", lastName);
+  formData.append("bio", bio);
+  formData.append("job", job);
+  formData.append("location", location);
+  formData.append("gender", gender);
+  formData.append("relationshipStatus", relationshipStatus);
+  formData.append("birthdate", birthdate);
+
+  if (profileImage) {
+    formData.append("profileImage", profileImage);
+  }
+
+  // const requestOptions = {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify(payload),
+  // };
+
+  const response = await fetch(`${BACKEND_URL}/users`, { 
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  };
-  try {
-    console.log(BACKEND_URL)
-    let response = await fetch(`${BACKEND_URL}/users`, requestOptions);
-  
-    console.log(response);
-    const data = await response.json();
+    body: formData,  // for image uploads, has to be formData
+  });
+
 
   // docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
-    if (response.status === 201) {
-      return data;
-    } 
-  } catch (error) {
-    throw new Error(error);
-  } 
+  if (response.status === 201) {
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    console.log("Saved token:", localStorage.getItem("token"));
+    return data;
+  } else {
+    throw new Error(
+      `Received status ${response.status} when signing up. Expected 201`
+    );
+  }
 }
