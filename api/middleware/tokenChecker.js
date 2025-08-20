@@ -5,8 +5,11 @@ function tokenChecker(req, res, next) {
   let token;
   const authHeader = req.get("Authorization");
 
+  console.log("Auth header recieved:", authHeader);
+
   if (authHeader) {
     token = authHeader.slice(7);
+    console.log("Extracted token:", token);
   }
 
   try {
