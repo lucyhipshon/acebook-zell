@@ -74,14 +74,14 @@ export function FeedPage() {
       <SortPosts/>
       <div className="feed" role="feed">
         {sortedPosts.map((post) => (
-         post._id && (
+          post._id && (
         <Post 
-           post={post} 
-           key={post._id} 
-           currentUser={currentUser} 
-           onDelete={fetchPosts}
-           onOpenComments={() => setActivePost(post)}
-       />
+            post={post} 
+            key={post._id} 
+            currentUser={currentUser} 
+            onDelete={fetchPosts}
+            onOpenComments={() => setActivePost(post)}
+        />
     )
     ))}
       </div>
@@ -90,10 +90,6 @@ export function FeedPage() {
         post={activePost}
         onClose={() => setActivePost(null)}
       />
-      <LogoutButton />
-      <Footer/>
       </div>
-
-    </div>
   );
 }

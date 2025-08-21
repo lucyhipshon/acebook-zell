@@ -163,10 +163,10 @@ return (
                 </span>
               </a>
               <a className="level-item"
-                 aria-label="like"
-                 onClick={handleLikeClick}
-                 style={{cursor:"pointer"}}
-                 >
+                  aria-label="like"
+                  onClick={handleLikeClick}
+                  style={{cursor:"pointer"}}
+                  >
                 <span className="icon is-small" style={{ marginRight: '4px' }}>
                   <i 
                     className="fas fa-heart" 
@@ -181,7 +181,6 @@ return (
                 </span>
               </a>
           </nav>
-        </div>
 
         {/* Post attachment images */}
         {props.post.image && (
@@ -197,8 +196,7 @@ return (
           <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
         </div>
       </article>
-      )
-    }
-    
+    );
+}
 
 export default Post;
