@@ -58,7 +58,28 @@ return (
       <div className="media">
         <div className="media-left">
           <figure className="image is-48x48">
-            <img src="/rubber_duck.jpg" alt={`Profile picture for ${getDisplayName(props.post.author)}`}/>
+            <img 
+                src={(() => {
+                  if (!props.post.author?.profileImage) {
+                    return 'http://localhost:3000/uploads/default.jpg';
+                  }
+                  // This the the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
+                  // Saw this on the ProfilePage component
+                  // If profileImage path has slash - use as is / if it doesn't - add it
+                  // Uses a ternary operator e.g. const variable = condition ? valueIfTrue : valueIfFalse;
+                  const profileImagePath = props.post.author.profileImage.startsWith('/') 
+                    ? props.post.author.profileImage 
+                    : '/' + props.post.author.profileImage;
+                  return `http://localhost:3000${profileImagePath}`;
+                })()} 
+                alt={`Profile picture for ${getDisplayName(props.post.author)}`}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+                }}
+              />
           </figure>
         </div>
         <div className="media-content">
@@ -94,7 +115,8 @@ return (
       </nav>
     </div>
 
-    {/* Display image if exists */}
+    {/* Duplicate image code - testing which one to keep */}
+    {/* Display image if exists
     {props.post.image && (
       <div style={{ marginTop: '8px' }}>
         <img 
@@ -108,9 +130,9 @@ return (
           }}
         />
       </div>
-    )}
+    )} */}
   </article>
-)
+  )
 }
 
 export default Post;
