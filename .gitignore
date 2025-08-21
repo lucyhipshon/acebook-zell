@@ -1,2 +1,6 @@
 .DS_Store
 .vscode
+# Ignore all files in uploads directory
+api/uploads/*
+# But keep the .gitkeep file to preserve directory structure
+!api/uploads/.gitkeep
