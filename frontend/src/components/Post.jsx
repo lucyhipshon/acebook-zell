@@ -1,3 +1,5 @@
+import { DeletePost } from "./DeletePost";
+
 function Post(props) {
 
   // Helper function for display name
@@ -66,7 +68,6 @@ return (
             <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
         </div>
     </div>
-
     <div className="content has-text-left">
       <p className="has-text-black hover-text-primary has-text-weight-normal">{props.post.message}</p>
       <br />
@@ -101,6 +102,9 @@ return (
         />
       </div>
     )}
+    <div className="media-right">
+      <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+    </div>
   </article>
 )
 }
