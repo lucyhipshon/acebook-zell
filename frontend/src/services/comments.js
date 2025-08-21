@@ -1,6 +1,6 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-// GET /posts/:postId/comments
+// GET
 export async function getComments(token, postId) {
   const requestOptions = {
     method: "GET",
@@ -15,7 +15,7 @@ export async function getComments(token, postId) {
   return await response.json();
 }
 
-// POST /posts/:postId/comments
+// POST
 export async function createComment(token, postId, message) {
   const requestOptions = {
     method: "POST",
@@ -28,5 +28,20 @@ export async function createComment(token, postId, message) {
 
   const response = await fetch(`${BACKEND_URL}/comments`, requestOptions);
   if (response.status !== 201) throw new Error("Unable to create comment");
+  return await response.json();
+}
+
+// DELETE
+export async function deleteComment(token, commentId) {
+  const requestOptions = {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    },
+  };
+
+  const response = await fetch(`${BACKEND_URL}/comments/${commentId}`, requestOptions);
+  if (response.status !== 200) throw new Error("Unable to delete comment");
   return await response.json();
 }

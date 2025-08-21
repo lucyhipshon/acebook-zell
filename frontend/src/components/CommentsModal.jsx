@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getComments, createComment } from "../services/comments";
+import DeleteComment from "./DeleteComment";
 
 export default function CommentsModal({ isActive, onClose, post }) {
   const [comments, setComments] = useState([]);
@@ -95,6 +96,12 @@ export default function CommentsModal({ isActive, onClose, post }) {
                   </p>
                 </div>
               </div>
+              <DeleteComment
+                comment={comment}
+                onDelete={() =>
+                  setComments((prev) => prev.filter((c) => c._id !== comment._id))
+                }
+              />
             </article>
           ))}
         </section>
