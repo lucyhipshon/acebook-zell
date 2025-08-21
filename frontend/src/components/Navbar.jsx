@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {useState} from "react";
 import LogoutButton from "./LogoutButton";
 // import "./Navbar.css";
@@ -6,6 +6,8 @@ import LogoutButton from "./LogoutButton";
 export function Navbar() {
     const { pathname } = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
     const isFeed = pathname === "/posts" || pathname.startsWith("/posts/");
     const isProfile = pathname === "/profile" || pathname.startsWith("/profile/");
     const isUsers = pathname === "/users" || pathname.startsWith("/users/");
@@ -14,6 +16,13 @@ export function Navbar() {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        if (searchTerm.trim()){
+            navigate(`/search?term=${encodeURIComponent(searchTerm)}`);
+        }
+    }
 
     return (
         <nav className="navbar is-link" role="navigation" aria-label="main navigation">
@@ -50,6 +59,22 @@ export function Navbar() {
                     </Link>
                     </div>
                 <div className="navbar-end">
+                    <div className="navbar-item">
+                        <form onSubmit={handleSearch}>
+                            <div className="field has-addons">
+                                <div className="control">
+                                    <input
+                                        className="input is-link"
+                                        type="text"
+                                        placeholder="Search posts..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
                     <div className="navbar-item">
                         <div className="buttons">
                             <div className="button is-link">
