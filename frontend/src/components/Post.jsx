@@ -1,3 +1,5 @@
+import { DeletePost } from "./DeletePost";
+
 function Post(props) {
 
   // Helper function for display name
@@ -87,52 +89,41 @@ return (
             <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
         </div>
     </div>
-
     <div className="content has-text-left">
       <p className="has-text-black hover-text-primary has-text-weight-normal">{props.post.message}</p>
       <br />
 
     </div>
-    {props.post.image &&(
-    <div className="card-image">
-      <figure className="image is-4by3">
-        <img src={props.post.image} alt={`Image for ${props.image}`}/>
-      </figure> 
-
-    </div>
-    )}
     <nav className="level is-pulled-right">
-          <a className="level-item is-pulled-right" aria-label="reply">
-            <span className="icon is-small">
-              <i className="fa-solid fa-comment" aria-hidden="true"></i>
-            </span>
-          </a>
-          <a className="level-item" aria-label="like">
-            <span className="icon is-small">
-              <i className="fas fa-heart" aria-hidden="true"></i>
-            </span>
-          </a>
-      </nav>
-    </div>
+              <a className="level-item is-pulled-right" aria-label="reply">
+                <span className="icon is-small">
+                  <i className="fa-solid fa-comment" aria-hidden="true"></i>
+                </span>
+              </a>
+              <a className="level-item" aria-label="like">
+                <span className="icon is-small">
+                  <i className="fas fa-heart" aria-hidden="true"></i>
+                </span>
+              </a>
+          </nav>
+        </div>
 
-    {/* Duplicate image code - testing which one to keep */}
-    {/* Display image if exists
-    {props.post.image && (
-      <div style={{ marginTop: '8px' }}>
-        <img 
-          src={props.post.image} 
-          alt="Post attachment" 
-          style={{
-            maxWidth: '100%',
-            height: 'auto',
-            borderRadius: '8px',
-            border: '1px solid #ddd'
-          }}
-        />
-      </div>
-    )} */}
-  </article>
-  )
-}
+        {/* Post attachment images */}
+        {props.post.image && (
+          <div className="card-image">
+            <figure className="image is-4by3">
+              <img src={props.post.image} alt={`Image for ${props.post.image}`}/>
+            </figure> 
+          </div>
+        )}
+
+        {/* Delete Post Button */}
+        <div className="media-right">
+          <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+        </div>
+      </article>
+      )
+    }
+    
 
 export default Post;
