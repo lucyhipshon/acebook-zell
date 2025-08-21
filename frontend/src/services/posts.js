@@ -101,7 +101,7 @@ export async function unlikePost(token, id) {
 
   export async function deletePostById(token, id) {
   const requestOptions = {
-    method: "GET",
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-type": "application/json",

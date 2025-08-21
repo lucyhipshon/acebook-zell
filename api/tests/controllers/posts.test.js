@@ -32,8 +32,10 @@ describe("/posts", () => {
     await Post.deleteMany({});
 
     user = new User({
-      email: "post-test@test.com",
+      email: "test@example.com",
       password: "12345678",
+      firstName: "Test",
+      lastName: "User",
     });
     await user.save();
     token = createToken(user.id);
@@ -214,6 +216,24 @@ describe("/posts", () => {
       expect(posts[0].image).toEqual(imageData);
       expect(posts[1].image).toBeUndefined();
     });
+
+    test("returns posts with populated author information", async () => {
+      const post1 = new Post({ message: "Test post", author: user._id });
+      await post1.save();
+
+      const response = await request(app)
+        .get("/posts")
+        .set("Authorization", `Bearer ${token}`);
+
+      const posts = response.body.posts;
+      expect(posts.length).toEqual(1);
+
+      // Verify author is populated with correct fields
+      expect(posts[0].author.email).toEqual("test@example.com");
+      expect(posts[0].author.firstName).toEqual("Test");
+      expect(posts[0].author.lastName).toEqual("User");
+      expect(posts[0].author._id).toBeDefined();
+    });
   });
 
   describe("GET, when token is missing", () => {
@@ -254,18 +274,24 @@ describe("/posts", () => {
   describe("GET /posts/:id", () => {
     describe("when token is present", () => {
       test("responds 200 and returns the post", async () => {
-        const post = await new Post({ message: "Hello, world!", author: user._id}).save();
+        const post = await new Post({
+          message: "Hello, world!",
+          author: user._id,
+        }).save();
         const res = await request(app)
           .get(`/posts/${post._id}`)
-          .set("Authorization", `Bearer ${token}`)
+          .set("Authorization", `Bearer ${token}`);
 
         expect(res.status).toEqual(200);
         expect(res.body.post._id).toEqual(post._id.toString());
         expect(res.body.post.message).toEqual("Hello, world!");
-      })
+      });
 
       test("returns a new token", async () => {
-        const post = await new Post({ message: "Token check", author: user._id }).save();
+        const post = await new Post({
+          message: "Token check",
+          author: user._id,
+        }).save();
 
         const response = await request(app)
           .get(`/posts/${post._id}`)
@@ -277,7 +303,27 @@ describe("/posts", () => {
 
         expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
       });
-    })
+
+      test("returns post with populated author information", async () => {
+        const post = await new Post({
+          message: "Single post test",
+          author: user._id,
+        }).save();
+
+        const res = await request(app)
+          .get(`/posts/${post._id}`)
+          .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toEqual(200);
+        expect(res.body.post._id).toEqual(post._id.toString());
+        expect(res.body.post.message).toEqual("Single post test");
+
+        // Verify author is populated with correct fields
+        expect(res.body.post.author.email).toEqual("test@example.com");
+        expect(res.body.post.author.firstName).toEqual("Test");
+        expect(res.body.post.author.lastName).toEqual("User");
+      });
+    });
 
     describe("error cases", () => {
       test("400 when id format is invalid", async () => {
@@ -303,93 +349,108 @@ describe("/posts", () => {
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
-        const post = await new Post({ message: "Will be blocked", author: user._id}).save();
-        
+        const post = await new Post({
+          message: "Will be blocked",
+          author: user._id,
+        }).save();
+
         const res = await request(app).get(`/posts/${post._id}`);
 
         expect(res.status).toEqual(401);
         expect(res.body.token).toEqual(undefined);
       });
     });
-  })
+  });
 
   describe("DELETE /posts/:id", () => {
     test("200: should delete the proper post and respond with a success message", async () => {
       const postResponse = await request(app)
         .post("/posts")
         .set("Authorization", `Bearer ${token}`)
-        .send({message: "Test"});
-      
+        .send({ message: "Test" });
+
       const postId = postResponse.body.post._id;
 
       const res = await request(app)
         .delete(`/posts/${postId}`)
         .set("Authorization", `Bearer ${token}`);
-      
-        expect(res.status).toBe(200);
-        expect(res.body.message).toBe("Post deleted successfully.");
-    })
 
-  test("404: should not delete the post if post does not exist", async () => {
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe("Post deleted successfully.");
+    });
+
+    test("404: should not delete the post if post does not exist", async () => {
       const invalidPostId = new mongoose.Types.ObjectId();
 
       const res = await request(app)
         .delete(`/posts/${invalidPostId}`)
-        .set("Authorization", `Bearer ${token}`)
-      
-        expect(res.status).toBe(404)
-        expect(res.body.message).toBe("Post not found.")
-    })
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBe("Post not found.");
+    });
 
     test("403: should not delete the post if it was created by anoter user", async () => {
       const postResponse = await request(app)
         .post("/posts")
         .set("Authorization", `Bearer ${token}`)
-        .send({message: "Test"});
-      
+        .send({ message: "Test" });
+
       const postId = postResponse.body.post._id;
       const otherAuthor = await new User({
-        email: "otherAuthor@email.com", 
-        password: "12345678"
+        email: "otherAuthor@email.com",
+        password: "12345678",
+        firstName: "Other",
+        lastName: "Author",
       }).save();
 
-      const tokenOtherAuthor = createToken(otherAuthor._id)
+      const tokenOtherAuthor = createToken(otherAuthor._id);
 
       const res = await request(app)
         .delete(`/posts/${postId}`)
-        .set("Authorization", `Bearer ${tokenOtherAuthor}`)
-      
-        expect(res.status).toBe(403)
-        expect(res.body.message).toBe("Unable to delete the post. You can only delete your own posts.")
-    })
+        .set("Authorization", `Bearer ${tokenOtherAuthor}`);
+
+      expect(res.status).toBe(403);
+      expect(res.body.message).toBe(
+        "Unable to delete the post. You can only delete your own posts."
+      );
+    });
 
     test("400: should return a 400 error if post_id is an invalid data type", async () => {
       const res = await request(app)
         .delete(`/posts/hello`)
-        .set("Authorization", `Bearer ${token}`)
-      
-        expect(res.status).toBe(400)
-        expect(res.body.message).toBe("Unable to delete the post. Invalid post id.")
-    })
-  })
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(
+        "Unable to delete the post. Invalid post id."
+      );
+    });
+  });
 
   describe("POST post/:id/like", () => {
     describe("when token is present", () => {
       test("responds 200 and adds a like (likedByCurrentUser is true, likesCount is 1)", async () => {
-        const post = await new Post({ message: "hello", author: user._id }).save();
+        const post = await new Post({
+          message: "hello",
+          author: user._id,
+        }).save();
 
         const res = await request(app)
           .post(`/posts/${post._id}/like`)
           .set("Authorization", `Bearer ${token}`);
 
         expect(res.status).toEqual(200);
-        expect(res.body.post._id).toEqual(post._id.toString())
+        expect(res.body.post._id).toEqual(post._id.toString());
         expect(res.body.post.likesCount).toBe(1);
         expect(res.body.post.likedByCurrentUser).toBe(true);
       });
 
       test("returns a new token", async () => {
-        const post = await new Post({ message: "token check", author: user._id }).save();
+        const post = await new Post({
+          message: "token check",
+          author: user._id,
+        }).save();
 
         const response = await request(app)
           .post(`/posts/${post._id}/like`)
@@ -403,7 +464,10 @@ describe("/posts", () => {
       });
 
       test("liking twice keeps count at 1", async () => {
-        const post = await new Post({ message: "only one like", author: user._id }).save();
+        const post = await new Post({
+          message: "only one like",
+          author: user._id,
+        }).save();
 
         await request(app)
           .post(`/posts/${post._id}/like`)
@@ -421,14 +485,17 @@ describe("/posts", () => {
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
-        const post = await new Post({ message: "blocked", author: user._id }).save();
+        const post = await new Post({
+          message: "blocked",
+          author: user._id,
+        }).save();
 
         const res = await request(app).post(`/posts/${post._id}/like`);
 
         expect(res.status).toEqual(401);
         expect(res.body.token).toEqual(undefined);
       });
-    })
+    });
 
     describe("error cases", () => {
       test("400 when id format is invalid", async () => {
@@ -452,13 +519,16 @@ describe("/posts", () => {
         expect(res.body.message).toEqual("Post not found");
         expect(res.body.token).toBeDefined();
       });
-    })
+    });
   });
 
   describe("DELETE /posts/:id/like", () => {
     describe("when token is present", () => {
       test("responds 200 and removes the like (likedByCurrentUser is false, likesCount is 0)", async () => {
-        const post = await new Post({ message: "will unlike", author: user._id }).save();
+        const post = await new Post({
+          message: "will unlike",
+          author: user._id,
+        }).save();
 
         await request(app)
           .post(`/posts/${post._id}/like`)
@@ -474,7 +544,10 @@ describe("/posts", () => {
       });
 
       test("unliking twice keeps count at 0", async () => {
-        const post = await new Post({ message: "double unlike", author: user._id }).save();
+        const post = await new Post({
+          message: "double unlike",
+          author: user._id,
+        }).save();
 
         const res1 = await request(app)
           .delete(`/posts/${post._id}/like`)
@@ -490,7 +563,10 @@ describe("/posts", () => {
       });
 
       test("returns a new token", async () => {
-        const post = await new Post({ message: "unlike token", author: user._id }).save();
+        const post = await new Post({
+          message: "unlike token",
+          author: user._id,
+        }).save();
 
         const response = await request(app)
           .delete(`/posts/${post._id}/like`)
@@ -502,11 +578,14 @@ describe("/posts", () => {
 
         expect(newDecoded.iat > oldDecoded.iat).toEqual(true);
       });
-    })
+    });
 
     describe("when token is missing", () => {
       test("responds 401 and no token returned", async () => {
-        const post = await new Post({ message: "blocked unlike", author: user._id }).save();
+        const post = await new Post({
+          message: "blocked unlike",
+          author: user._id,
+        }).save();
 
         const res = await request(app).delete(`/posts/${post._id}/like`);
 
@@ -537,8 +616,6 @@ describe("/posts", () => {
         expect(res.body.message).toEqual("Post not found");
         expect(res.body.token).toBeDefined();
       });
-    })
-  })
+    });
+  });
 });
-
-

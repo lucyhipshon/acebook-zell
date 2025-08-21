@@ -210,8 +210,8 @@ describe("/comments", () => {
         const comments = response.body.comments;
         expect(comments.length).toEqual(2);
         // Chnaged the order here as test was failing - in getAllComments the .sort({ createdAt: -1 }) sorts comments by creation date with newest first - changed test to match this behaviour
-        expect(comments[1].content).toEqual("Second comment");
-        expect(comments[0].content).toEqual("First comment");
+        expect(comments[1].content).toEqual("First comment");
+        expect(comments[0].content).toEqual("Second comment");
       });
 
       test("returns a new token", async () => {

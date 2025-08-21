@@ -3,20 +3,26 @@ const Post = require("../models/post");
 const { generateToken } = require("../lib/token");
 
 async function getAllPosts(req, res) {
-  const posts = await Post.find().populate("author", "email"); // using email for now, dont want to add changes to the user schema that will affect work that other will be doing
+  const posts = await Post.find().populate(
+    "author",
+    "email firstName lastName profileImage"
+  );
   const token = generateToken(req.user_id);
   res.status(200).json({ posts: posts, token: token });
 }
 
 async function getPostById(req, res) {
-  const {id} = req.params;
+  const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const token = generateToken(req.user_id);
     return res.status(400).json({ message: "Invalid post id", token });
   }
 
-  const post = await Post.findById(id);
+  const post = await Post.findById(id).populate(
+    "author",
+    "email firstName lastName profileImage"
+  );
 
   if (!post) {
     const token = generateToken(req.user_id);
@@ -24,7 +30,7 @@ async function getPostById(req, res) {
   }
 
   const newToken = generateToken(req.user_id);
-  return res.status(200).json({post, token: newToken});
+  return res.status(200).json({ post, token: newToken });
 }
 
 async function createPost(req, res) {
@@ -76,20 +82,28 @@ async function deletePostById(req, res) {
   try {
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       const token = generateToken(userId);
-      return res.status(400).json({ message: "Unable to delete the post. Invalid post id.", token})
+      return res.status(400).json({
+        message: "Unable to delete the post. Invalid post id.",
+        token,
+      });
     }
-    const post = await Post.findOne({_id: postId});
+    const post = await Post.findOne({ _id: postId });
     if (!post) {
-      return res.status(404).json({message: "Post not found."})
+      return res.status(404).json({ message: "Post not found." });
     }
     if (userId !== post.author.toString()) {
-      return res.status(403).json({message: "Unable to delete the post. You can only delete your own posts."})
+      return res.status(403).json({
+        message:
+          "Unable to delete the post. You can only delete your own posts.",
+      });
     }
-    await Post.deleteOne({_id: postId})
-    return res.status(200).send({message: "Post deleted successfully."})
+    await Post.deleteOne({ _id: postId });
+    return res.status(200).send({ message: "Post deleted successfully." });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({message: "Something went wrong. Please try deleting the post again."});
+    return res.status(500).json({
+      message: "Something went wrong. Please try deleting the post again.",
+    });
   }
 }
 
@@ -104,8 +118,11 @@ async function likePost(req, res) {
 
   // $addToSet is a mongodb update operator. This means it can only be added once
   // { new: true } returns the updated document
-  const updated = await Post.findByIdAndUpdate( // <- Mongodb method
-    id, { $addToSet: { likes: userId } }, { new: true } 
+  const updated = await Post.findByIdAndUpdate(
+    // <- Mongodb method
+    id,
+    { $addToSet: { likes: userId } },
+    { new: true }
   );
 
   if (!updated) {
@@ -115,13 +132,13 @@ async function likePost(req, res) {
 
   // create a per-user flag for whether they liked it (not stored in database)
   const likedByCurrentUser = Array.isArray(updated.likes) // If the likes array contains the userId, likedByCurrentUser is true
-    ? updated.likes.some((u) => String(u) === String(userId)) 
+    ? updated.likes.some((u) => String(u) === String(userId))
     : false;
-  
+
   // spread updated.JSON() so virtuals like likesCount are included in the payload
   const token = generateToken(userId);
   return res.status(200).json({
-    post: {...updated.toJSON(), likedByCurrentUser },
+    post: { ...updated.toJSON(), likedByCurrentUser },
     token,
   });
 }
@@ -136,7 +153,9 @@ async function unlikePost(req, res) {
   }
 
   const updated = await Post.findByIdAndUpdate(
-    id, { $pull: { likes: userId } }, { new: true } // <- Uses $pull to remove the userId form the array if it is present
+    id,
+    { $pull: { likes: userId } },
+    { new: true } // <- Uses $pull to remove the userId form the array if it is present
   );
 
   if (!updated) {
@@ -145,12 +164,12 @@ async function unlikePost(req, res) {
   }
 
   const likedByCurrentUser = Array.isArray(updated.likes)
-    ? updated.likes.some((u) => String(u) === String(userId)) 
+    ? updated.likes.some((u) => String(u) === String(userId))
     : false;
 
   const token = generateToken(userId);
   return res.status(200).json({
-    post: {...updated.toJSON(), likedByCurrentUser },
+    post: { ...updated.toJSON(), likedByCurrentUser },
     token,
   });
 }

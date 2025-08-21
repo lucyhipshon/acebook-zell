@@ -97,8 +97,10 @@ export function CreatePostForm(props) {
             // Call service function (needs token and message data - see function sig in service for context)
             await createPost(token, postData);
             props.onPostCreated(postData);
+            setImage(null)
+            setImagePreview(null)
             setMessage("") //clear the form for the feed page after submitting
-
+            
         } catch (err) {
             console.error(err) // for devs - error in browser console
             setSubmitError("Failed to create post. Please try again."); // for user - stay on the page and show the error
@@ -111,8 +113,8 @@ export function CreatePostForm(props) {
         <form className="box" onSubmit={handleSubmit}>
             {/* Message input field */}
             <div className="field">
-                <label className="label is-flex is-justify-content-space-between">
-                    New Post <span className="has-text-grey-light">({count}/{maxLength})</span>
+                <label className="label is-flex is-justify-content-space-between is-size-4 has-text-weight-extrabold has-text-link">
+                    New Quack <span className="has-text-grey-light is-size-6">({count}/{maxLength})</span>
                 </label>
                 <div className="control">
                     <textarea 
@@ -185,7 +187,7 @@ export function CreatePostForm(props) {
                 <div className="control">
                     <button 
                         type="submit" 
-                        className="button is-primary"
+                        className="button is-link"
                         disabled={isEmpty}>
                         Submit
                     </button>

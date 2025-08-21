@@ -1,4 +1,33 @@
+import { useState } from "react";
+import { DeletePost } from "./DeletePost";
+import { likePost, unlikePost } from "../services/posts";
+
+
 function Post(props) {
+
+  // State for like functionality
+  const [isLiked, setIsLiked] = useState(props.post.likedByCurrentUser || false);
+  const [likeCount, setLikeCount] = useState(props.post.likesCount || 0);
+
+
+  // Helper function for display name
+  const getDisplayName = (author) => {
+    if (!author) return 'Unknown';
+    
+    const firstName = author.firstName?.trim();
+    const lastName = author.lastName?.trim();
+    
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    } else if (lastName) {
+      return lastName;
+    } else {
+      return author.email || 'Unknown User';
+    }
+  };
+
 
   // Format time function for the created at timestamp
   const formatTimeAgo = (timestamp) => {
@@ -26,41 +55,89 @@ function Post(props) {
   };
 
 
+    // Handle like/unlike functionality
+  const handleLikeClick = async () => {
 
+    // Auth
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
+    // Updates the UI immediately before the API call completes --> users see their action take effect instantly.
+    // Had originally planed to do it directly:
+    // setIsLiked(!isLiked);
+    // setLikeCount(likeCount + 1);
+    // But if server fails - you can keep the old values as a fallback (see reverrt update on error below) 
+    // This patter is called "optimistic update with rollback"
+    // https://blog.logrocket.com/understanding-optimistic-ui-react-useoptimistic-hook/
+    const newIsLiked = !isLiked;
+    const newLikeCount = newIsLiked ? likeCount + 1 : likeCount - 1;
+    
+    setIsLiked(newIsLiked);
+    setLikeCount(newLikeCount);
 
+    try {
+      if (newIsLiked) {
+        const response = await likePost(token, props.post._id);
+        // Updates the auth token if the server provides a refreshed one (JWT rotation thingy)
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+      } else {
+        const response = await unlikePost(token, props.post._id);
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(isLiked);
+      setLikeCount(likeCount);
+      console.error("Error toggling like:", error);
+    }
+  };
 
-
-  // Update the jsx strucure props isn't just message - will need a div for the timestamp and the author info details 
 
 return (
-  <article className="card" key={props.post_id}>
+  <article className="card" key={props.post._id}>
     <div className="card-content">
       <div className="media">
         <div className="media-left">
           <figure className="image is-48x48">
-            <img src="/rubber_duck.jpg" alt={`Image for ${props.author}`}/>
+            <img 
+                src={(() => {
+                  if (!props.post.author?.profileImage) {
+                    return 'http://localhost:3000/uploads/default.jpg';
+                  }
+                  // This is the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
+                  // Saw this on the ProfilePage component
+                  // If profileImage path has slash - use as is / if it doesn't - add it
+                  // Uses a ternary operator e.g. const variable = condition ? valueIfTrue : valueIfFalse;
+                  const profileImagePath = props.post.author.profileImage.startsWith('/') 
+                    ? props.post.author.profileImage 
+                    : '/' + props.post.author.profileImage;
+                  return `http://localhost:3000${profileImagePath}`;
+                })()} 
+                alt={`Profile picture for ${getDisplayName(props.post.author)}`}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+                }}
+              />
           </figure>
         </div>
         <div className="media-content">
-            <p className="title is-4 has-text-left">{props.post.author?.email || 'Unknown'}</p>
+            <p className="title is-4 has-text-left">{getDisplayName(props.post.author)}</p>
             <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
         </div>
     </div>
-
     <div className="content has-text-left">
       <p className="has-text-black hover-text-primary has-text-weight-normal">{props.post.message}</p>
       <br />
 
     </div>
-    {props.post.image &&(
-    <div className="card-image">
-      <figure className="image is-4by3">
-        <img src={props.post.image} alt={`Image for ${props.image}`}/>
-      </figure>
 
-    </div>
-    )}
     <nav className="level is-pulled-right">
           <a 
             className="level-item is-pulled-right"
@@ -79,23 +156,49 @@ return (
       </nav>
     </div>
 
-    {/* Display image if exists */}
-    {props.post.image && (
-      <div style={{ marginTop: '8px' }}>
-        <img 
-          src={props.post.image} 
-          alt="Post attachment" 
-          style={{
-            maxWidth: '100%',
-            height: 'auto',
-            borderRadius: '8px',
-            border: '1px solid #ddd'
-          }}
-        />
-      </div>
-    )}
-  </article>
-)
-}
+    <nav className="level is-pulled-right">
+              <a className="level-item is-pulled-right" aria-label="reply">
+                <span className="icon is-small">
+                  <i className="fa-solid fa-comment" aria-hidden="true"></i>
+                </span>
+              </a>
+              <a className="level-item"
+                 aria-label="like"
+                 onClick={handleLikeClick}
+                 style={{cursor:"pointer"}}
+                 >
+                <span className="icon is-small" style={{ marginRight: '4px' }}>
+                  <i 
+                    className="fas fa-heart" 
+                    aria-hidden="true"
+                    style={{
+                      color: isLiked ? '#ff3860' : '#3273dc'
+                    }}
+                    ></i>
+                </span>
+                <span style={{fontSize: '0.9rem'}}>
+                  {likeCount}
+                </span>
+              </a>
+          </nav>
+        </div>
+
+        {/* Post attachment images */}
+        {props.post.image && (
+          <div className="card-image">
+            <figure className="image is-4by3">
+              <img src={props.post.image} alt={`Image for ${props.post.image}`}/>
+            </figure> 
+          </div>
+        )}
+
+        {/* Delete Post Button */}
+        <div className="media-right">
+          <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+        </div>
+      </article>
+      )
+    }
+    
 
 export default Post;
