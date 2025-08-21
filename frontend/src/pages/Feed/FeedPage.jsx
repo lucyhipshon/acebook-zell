@@ -10,6 +10,7 @@ import { SortPosts } from "../../components/SortPosts";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -54,6 +55,10 @@ export function FeedPage() {
     };
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      setCurrentUser(userId)
+    }
     fetchPosts();
   }, [navigate]);
 
@@ -69,7 +74,7 @@ export function FeedPage() {
       <div className="feed" role="feed">
         {sortedPosts.map((post) => (
            post._id && (
-          <Post post={post} key={post._id} />
+          <Post post={post} key={post._id} currentUser={currentUser} onDelete={fetchPosts} />
         )
         ))}
       </div>
