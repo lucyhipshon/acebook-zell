@@ -1,5 +1,24 @@
 function Post(props) {
 
+  // Helper function for display name
+  const getDisplayName = (author) => {
+    if (!author) return 'Unknown';
+    
+    const firstName = author.firstName?.trim();
+    const lastName = author.lastName?.trim();
+    
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    } else if (lastName) {
+      return lastName;
+    } else {
+      return author.email || 'Unknown User';
+    }
+  };
+
+
   // Format time function for the created at timestamp
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -34,16 +53,16 @@ function Post(props) {
   // Update the jsx strucure props isn't just message - will need a div for the timestamp and the author info details 
 
 return (
-  <article className="card" key={props.post_id}>
+  <article className="card" key={props.post._id}>
     <div className="card-content">
       <div className="media">
         <div className="media-left">
           <figure className="image is-48x48">
-            <img src="/rubber_duck.jpg" alt={`Image for ${props.author}`}/>
+            <img src="/rubber_duck.jpg" alt={`Profile picture for ${getDisplayName(props.post.author)}`}/>
           </figure>
         </div>
         <div className="media-content">
-            <p className="title is-4 has-text-left">{props.post.author?.email || 'Unknown'}</p>
+            <p className="title is-4 has-text-left">{getDisplayName(props.post.author)}</p>
             <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
         </div>
     </div>
