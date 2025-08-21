@@ -213,6 +213,7 @@ const PostsController = {
   deletePostById: deletePostById,
   likePost: likePost,
   unlikePost: unlikePost,
+  getMyPosts: getMyPosts,
 };
 
 module.exports = PostsController;
