@@ -164,13 +164,7 @@ describe("/users", () => {
     let user;
     let token;
 
-    beforeAll(() => {
-    // Make sure JWT_SECRET matches test env
-    process.env.JWT_SECRET = process.env.JWT_SECRET || "test_secret";
-    });
-
     beforeEach(async () => {
-      await User.deleteMany({});
       user = new User({
         email: 'profile@test.com',
         password: '12345678',
@@ -179,6 +173,9 @@ describe("/users", () => {
         bio: 'Test bio',
         profileImage: '/uploads/default.jpg',
         backgroundImage: '/uploads/bg.jpg',
+        job: 'Developer',
+        location: 'London',
+        relationshipStatus: 'Single',
       });
       await user.save();
 
@@ -196,6 +193,10 @@ describe("/users", () => {
       expect(res.body.bio).toBe(user.bio);
       expect(res.body.profileImage).toBe(user.profileImage);
       expect(res.body.backgroundImage).toBe(user.backgroundImage);
+      expect(res.body.email).toBe(user.email);
+      expect(res.body.job).toBe(user.job);
+      expect(res.body.location).toBe(user.location);
+      expect(res.body.relationshipStatus).toBe(user.relationshipStatus);
     });
 
     test('returns 401 if no token provided', async () => {
@@ -219,7 +220,6 @@ describe("/users", () => {
     let user;
 
     beforeEach(async () => {
-      await User.deleteMany({});
       user = new User({
         email: "bgtest@example.com",
         password: "password123",
@@ -256,15 +256,15 @@ describe("/users", () => {
     });
 
     test("returns 404 if user does not exist", async () => {
-      const fakeUserId = "507f1f77bcf86cd799439011"; // valid ObjectId but not in DB
+      const fakeUserId = "507f1f77bcf86cd799439011"; 
       const imagePath = path.join(__dirname, "../uploads/test-background.jpg");
 
       const response = await request(app)
         .post(`/users/upload-background/${fakeUserId}`)
         .attach("backgroundImage", imagePath)
-        .expect(200); // Your current route doesn't 404 if user not found
-
-      // Optional: You could add logic in the route to return 404 if `updatedUser` is null
+        .expect(404); 
+        
+      expect(response.body.error).toBe("User not found");
     });
   });
 

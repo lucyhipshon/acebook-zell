@@ -54,6 +54,11 @@ router.post('/upload-background/:userId', upload.single('backgroundImage'), asyn
       { new: true }
     );
 
+    if (!updatedUser) {
+      console.log('User not found for ID:', userId);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     console.log('User updated:', updatedUser);
 
     res.status(200).json({ backgroundImage: filePath, user: updatedUser });
