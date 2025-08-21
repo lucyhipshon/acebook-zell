@@ -60,7 +60,28 @@ return (
       <div className="media">
         <div className="media-left">
           <figure className="image is-48x48">
-            <img src="/rubber_duck.jpg" alt={`Profile picture for ${getDisplayName(props.post.author)}`}/>
+            <img 
+                src={(() => {
+                  if (!props.post.author?.profileImage) {
+                    return 'http://localhost:3000/uploads/default.jpg';
+                  }
+                  // This the the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
+                  // Saw this on the ProfilePage component
+                  // If profileImage path has slash - use as is / if it doesn't - add it
+                  // Uses a ternary operator e.g. const variable = condition ? valueIfTrue : valueIfFalse;
+                  const profileImagePath = props.post.author.profileImage.startsWith('/') 
+                    ? props.post.author.profileImage 
+                    : '/' + props.post.author.profileImage;
+                  return `http://localhost:3000${profileImagePath}`;
+                })()} 
+                alt={`Profile picture for ${getDisplayName(props.post.author)}`}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+                }}
+              />
           </figure>
         </div>
         <div className="media-content">
@@ -74,39 +95,35 @@ return (
 
     </div>
     <nav className="level is-pulled-right">
-          <a className="level-item is-pulled-right" aria-label="reply">
-            <span className="icon is-small">
-              <i className="fa-solid fa-comment" aria-hidden="true"></i>
-            </span>
-          </a>
-          <a className="level-item" aria-label="like">
-            <span className="icon is-small">
-              <i className="fas fa-heart" aria-hidden="true"></i>
-            </span>
-          </a>
-      </nav>
-    </div>
+              <a className="level-item is-pulled-right" aria-label="reply">
+                <span className="icon is-small">
+                  <i className="fa-solid fa-comment" aria-hidden="true"></i>
+                </span>
+              </a>
+              <a className="level-item" aria-label="like">
+                <span className="icon is-small">
+                  <i className="fas fa-heart" aria-hidden="true"></i>
+                </span>
+              </a>
+          </nav>
+        </div>
 
-    {/* Display image if exists */}
-    {props.post.image && (
-      <div style={{ marginTop: '8px' }}>
-        <img 
-          src={props.post.image} 
-          alt="Post attachment" 
-          style={{
-            maxWidth: '100%',
-            height: 'auto',
-            borderRadius: '8px',
-            border: '1px solid #ddd'
-          }}
-        />
-      </div>
-    )}
-    <div className="media-right">
-      <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
-    </div>
-  </article>
-)
-}
+        {/* Post attachment images */}
+        {props.post.image && (
+          <div className="card-image">
+            <figure className="image is-4by3">
+              <img src={props.post.image} alt={`Image for ${props.post.image}`}/>
+            </figure> 
+          </div>
+        )}
+
+        {/* Delete Post Button */}
+        <div className="media-right">
+          <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+        </div>
+      </article>
+      )
+    }
+    
 
 export default Post;

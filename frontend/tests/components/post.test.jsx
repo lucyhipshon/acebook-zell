@@ -10,7 +10,8 @@ describe("Post", () => {
       author: {
         email: "test@example.com",
         firstName: "John",
-        lastName: "Doe"
+        lastName: "Doe",
+        profileImage: "/uploads/profile.jpg"  
       },
       createdAt: new Date().toISOString()
     };
@@ -29,7 +30,9 @@ describe("Post", () => {
       message: "test message",
       author: {
         email: "test@example.com",
-        firstName: "OnlyFirst"
+        firstName: "OnlyFirst",
+        profileImage: "/uploads/default.jpg"  
+
       },
       createdAt: new Date().toISOString()
     };
@@ -46,7 +49,8 @@ describe("Post", () => {
       message: "test message", 
       author: {
         email: "test@example.com",
-        lastName: "OnlyLast"
+        lastName: "OnlyLast",
+        profileImage: "/uploads/default.jpg"
       },
       createdAt: new Date().toISOString()
     };
@@ -61,7 +65,9 @@ describe("Post", () => {
     const testPost = {
       _id: "126",
       message: "test message",
-      author: {email: "fallback@example.com"},  
+      author: {email: "fallback@example.com",
+      profileImage: null
+    },  
       createdAt: new Date().toISOString()
     };
 

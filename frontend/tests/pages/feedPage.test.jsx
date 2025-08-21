@@ -37,7 +37,8 @@ describe("Feed Page", () => {
         _id: "u1", 
         email: "alice@example.com",
         firstName: "Alice",        
-        lastName: "Smith"          
+        lastName: "Smith",
+        profileImage: "/uploads/alice.jpg"          
       },
       createdAt: "2025-08-11T16:36:15.000Z",
       updatedAt: "2025-08-11T16:36:15.000Z",  
