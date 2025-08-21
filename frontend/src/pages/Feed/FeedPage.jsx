@@ -90,10 +90,6 @@ export function FeedPage() {
         post={activePost}
         onClose={() => setActivePost(null)}
       />
-      <LogoutButton />
-      <Footer/>
       </div>
-
-    </div>
   );
 }
