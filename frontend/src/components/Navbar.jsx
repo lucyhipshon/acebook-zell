@@ -26,7 +26,7 @@ export function Navbar() {
                     />
                     <span className="name is-size-3 has-text-weight-extrabold">QuackBook</span>
                 </Link>
-                <a role="button" class={`navbar-burger ${isMenuOpen ? 'is-active' : ''}`} aria-label="menu" aria-expanded={isMenuOpen} onClick={toggleMenu}>
+                <a role="button" className={`navbar-burger ${isMenuOpen ? 'is-active' : ''}`} aria-label="menu" aria-expanded={isMenuOpen} onClick={toggleMenu}>
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
