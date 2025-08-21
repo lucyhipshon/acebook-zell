@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { getComments, createComment } from "../services/comments";
+import { getComments, createComment, updateComment } from "../services/comments";
 import DeleteComment from "./DeleteComment";
+import EditComment from "./EditComment";
 
 export default function CommentsModal({ isActive, onClose, post }) {
   const [comments, setComments] = useState([]);
   const [error, setError] = useState("");
   const [body, setBody] = useState("");
+  const [editingId, setEditingId] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -31,16 +33,32 @@ export default function CommentsModal({ isActive, onClose, post }) {
 
     try {
       setError("");
-      const result = await createComment(token, post._id, message); //call backend to create new comment
-      if (result?.token) localStorage.setItem("token", result.token); // store refreshed token if backend sent one
-      if (result?.comment) setComments((prev) => [result.comment, ...prev]); // prepends the newest comment to the list
-      setBody(""); // clear the textarea on success
+        if (editingId) {
+        // UPDATE existing comment
+        const res = await updateComment(token, editingId, message); // { comment, token }
+        if (res?.token) localStorage.setItem("token", res.token);
+        if (res?.comment) {
+          setComments((prev) =>
+            prev.map((c) => (c._id === editingId ? res.comment : c))
+          );
+        }
+        setEditingId(null);
+        setBody("");
+      } else {
+        // CREATE new comment
+        const result = await createComment(token, post._id, message); // { comment, token }
+        if (result?.token) localStorage.setItem("token", result.token);
+        if (result?.comment) setComments((prev) => [result.comment, ...prev]);
+        setBody("");
+      }
     } catch (e) {
       setError(e.message || "Failed to post comment");
+      setError(e.message || (editingId ? "Failed to update comment" : "Failed to post comment"));
     }
   }
 
-    const formatTimeAgo = (timestamp) => { // Format time function taken from Post.jsx
+    // Format time function taken from Post.jsx
+    const formatTimeAgo = (timestamp) => { 
     const now = new Date();
     const postTime = new Date(timestamp);
 
@@ -95,13 +113,23 @@ export default function CommentsModal({ isActive, onClose, post }) {
                     {comment.content} {/* actual comment text */}
                   </p>
                 </div>
+                {/* Action buttons (author-only handled inside the components) */}
+                <div className="buttons are-small is-right" style={{ marginTop: "0.25rem" }}>
+                  <EditComment
+                    comment={comment}
+                    onEdit={(c) => {
+                      setEditingId(c._id);     // enter edit mode
+                      setBody(c.content);      // prefill textarea with current text
+                    }}
+                  />
+                  <DeleteComment
+                    comment={comment}
+                    onDelete={() =>
+                      setComments((prev) => prev.filter((c) => c._id !== comment._id))
+                    }
+                  />
+                </div>
               </div>
-              <DeleteComment
-                comment={comment}
-                onDelete={() =>
-                  setComments((prev) => prev.filter((c) => c._id !== comment._id))
-                }
-              />
             </article>
           ))}
         </section>
@@ -109,7 +137,9 @@ export default function CommentsModal({ isActive, onClose, post }) {
         <footer className="modal-card-foot is-block"> {/* footer that holds the comment creation form */}
           <form onSubmit={handleSubmit}>
             <div className="field">
-              <label className="label">Add a comment</label>
+              <label className="label">
+                {editingId ? "Edit your comment" : "Add a comment"}
+              </label>
               <div className="control">
                 <textarea
                   className="textarea"
@@ -124,13 +154,24 @@ export default function CommentsModal({ isActive, onClose, post }) {
             </div>
 
             <div className="field is-grouped is-justify-content-flex-end">
+              {editingId && (
+                <div className="control">
+                  <button
+                    type="button"
+                    className="button is-light"
+                    onClick={() => { setEditingId(null); setBody(""); }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               <div className="control">
                 <button
                   type="submit"
-                  className={`button is-primary`}
+                  className={`button is-link`}
                   disabled={!body.trim()} // disable when empty / whitespace-only
                 >
-                  Post comment
+                  {editingId ? "Save changes" : "Post comment"}
                 </button>
               </div>
             </div>

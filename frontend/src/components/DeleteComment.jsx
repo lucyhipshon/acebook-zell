@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { deleteComment } from "../services/comments";
 
-export function DeleteComment({ comment, onDelete }) {
+export default function DeleteComment({ comment, onDelete }) {
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const token = localStorage.getItem("token");
@@ -11,14 +11,14 @@ export function DeleteComment({ comment, onDelete }) {
   const currentUserId = payload?.sub;
 
   const isAuthor = currentUserId && comment?.author?._id === currentUserId;
-  if (!isAuthor) return null; // don't show the button to non-authors
+  if (!isAuthor) return null;
 
   const handleDeletion = async () => {
     setIsDeleting(true);
     try {
       const res = await deleteComment(token, comment._id);
       if (res?.token) localStorage.setItem("token", res.token);
-      onDelete?.(); // let parent remove it from UI
+      onDelete?.();
     } catch (err) {
       setError(err.message || "Failed to delete comment");
       setIsDeleting(false);
@@ -26,13 +26,15 @@ export function DeleteComment({ comment, onDelete }) {
   };
 
   return (
-    <div className="buttons is-right">
-      <button className="button is-light is-small" onClick={handleDeletion} disabled={isDeleting}>
+    <div>
+      <button
+        className="button is-light is-small"
+        onClick={handleDeletion}
+        disabled={isDeleting}
+      >
         {isDeleting ? "Deleting…" : "Delete"}
       </button>
-      {error && <p className="has-text-danger is-size-7">{error}</p>}
+      {error && <p className="help is-danger is-size-7">{error}</p>}
     </div>
   );
 }
-
-export default DeleteComment;
