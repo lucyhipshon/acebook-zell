@@ -8,9 +8,11 @@ import {CreatePostForm} from "../../components/CreatePostForm";
 import LogoutButton from "../../components/LogoutButton";
 import { Footer } from "../../components/Footer";
 import { Navbar } from "../../components/Navbar";
+import CommentsModal from "../../components/CommentsModal";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
+  const [activePost, setActivePost] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -41,11 +43,20 @@ export function FeedPage() {
       </div>
       <div className="feed" role="feed">
         {posts.map((post) => (
-           post._id && (
-          <Post post={post} key={post._id} />
+          post._id && (
+          <Post 
+            post={post} 
+            key={post._id} 
+            onOpenComments={() => setActivePost(post)}
+          />
         )
         ))}
       </div>
+      <CommentsModal
+        isActive={activePost}
+        post={activePost}
+        onClose={() => setActivePost(null)}
+      />
       <LogoutButton />
       <Footer/>
     </div>

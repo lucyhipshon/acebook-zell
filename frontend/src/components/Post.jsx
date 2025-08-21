@@ -57,12 +57,16 @@ return (
     <div className="card-image">
       <figure className="image is-4by3">
         <img src={props.post.image} alt={`Image for ${props.image}`}/>
-      </figure> 
+      </figure>
 
     </div>
     )}
     <nav className="level is-pulled-right">
-          <a className="level-item is-pulled-right" aria-label="reply">
+          <a 
+            className="level-item is-pulled-right"
+            aria-label="open comments"
+            onClick={props.onOpenComments}
+          >
             <span className="icon is-small">
               <i className="fa-solid fa-comment" aria-hidden="true"></i>
             </span>
