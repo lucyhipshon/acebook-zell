@@ -3,10 +3,20 @@ const Post = require("../models/post");
 const { generateToken } = require("../lib/token");
 
 async function getAllPosts(req, res) {
-  const posts = await Post.find().populate(
+   const searchTerm = req.query.q;
+
+  let query = {}; 
+  if (searchTerm) {
+    query = {
+      message: { $regex: new RegExp(searchTerm, 'i') } 
+    };
+  }
+
+  const posts = await Post.find(query).populate(
     "author",
     "email firstName lastName profileImage"
   );
+  
   const token = generateToken(req.user_id);
   res.status(200).json({ posts: posts, token: token });
 }

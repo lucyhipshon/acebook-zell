@@ -6,6 +6,7 @@ import { SignupPage } from "./pages/Signup/SignupPage";
 import { FeedPage } from "./pages/Feed/FeedPage";
 import { CreatePostPage } from "./pages/CreatePost/CreatePostPage"
 import ProfilePage from "./pages/Profile/ProfilePage"
+import { SearchPosts } from "./components/SearchPosts";
 
 
 // docs: https://reactrouter.com/en/main/start/overview
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: <ProfilePage />
+  },
+  {
+    path: "/search",
+    element: <SearchPosts />
   }
 ]);
 

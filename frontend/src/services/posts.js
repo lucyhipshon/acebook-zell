@@ -120,3 +120,25 @@ export async function unlikePost(token, id) {
 }
 }
 
+
+export async function searchPosts(token, searchTerm = "") {
+  const url = `${BACKEND_URL}/posts?q=${encodeURIComponent(searchTerm)}`; 
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`, 
+      "Content-type": "application/json",
+    },
+  };
+
+  try {
+    const response = await fetch(url, requestOptions);
+    const data = await response.json();
+    
+    if (response.status === 200) {
+      return data;
+    } 
+  } catch(error) {
+    throw new Error(error);
+  }
+}
