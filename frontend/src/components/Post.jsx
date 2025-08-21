@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { DeletePost } from "./DeletePost";
+import { likePost, unlikePost } from "../services/posts";
+
 
 function Post(props) {
+
+  // State for like functionality
+  const [isLiked, setIsLiked] = useState(props.post.likedByCurrentUser || false);
+  const [likeCount, setLikeCount] = useState(props.post.likesCount || 0);
+
 
   // Helper function for display name
   const getDisplayName = (author) => {
@@ -47,12 +55,47 @@ function Post(props) {
   };
 
 
+    // Handle like/unlike functionality
+  const handleLikeClick = async () => {
 
+    // Auth
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
+    // Updates the UI immediately before the API call completes --> users see their action take effect instantly.
+    // Had originally planed to do it directly:
+    // setIsLiked(!isLiked);
+    // setLikeCount(likeCount + 1);
+    // But if server fails - you can keep the old values as a fallback (see reverrt update on error below) 
+    // This patter is called "optimistic update with rollback"
+    // https://blog.logrocket.com/understanding-optimistic-ui-react-useoptimistic-hook/
+    const newIsLiked = !isLiked;
+    const newLikeCount = newIsLiked ? likeCount + 1 : likeCount - 1;
+    
+    setIsLiked(newIsLiked);
+    setLikeCount(newLikeCount);
 
+    try {
+      if (newIsLiked) {
+        const response = await likePost(token, props.post._id);
+        // Updates the auth token if the server provides a refreshed one (JWT rotation thingy)
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+      } else {
+        const response = await unlikePost(token, props.post._id);
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(isLiked);
+      setLikeCount(likeCount);
+      console.error("Error toggling like:", error);
+    }
+  };
 
-
-  // Update the jsx strucure props isn't just message - will need a div for the timestamp and the author info details 
 
 return (
   <article className="card" key={props.post._id}>
@@ -65,7 +108,7 @@ return (
                   if (!props.post.author?.profileImage) {
                     return 'http://localhost:3000/uploads/default.jpg';
                   }
-                  // This the the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
+                  // This is the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
                   // Saw this on the ProfilePage component
                   // If profileImage path has slash - use as is / if it doesn't - add it
                   // Uses a ternary operator e.g. const variable = condition ? valueIfTrue : valueIfFalse;
@@ -100,9 +143,22 @@ return (
                   <i className="fa-solid fa-comment" aria-hidden="true"></i>
                 </span>
               </a>
-              <a className="level-item" aria-label="like">
-                <span className="icon is-small">
-                  <i className="fas fa-heart" aria-hidden="true"></i>
+              <a className="level-item"
+                 aria-label="like"
+                 onClick={handleLikeClick}
+                 style={{cursor:"pointer"}}
+                 >
+                <span className="icon is-small" style={{ marginRight: '4px' }}>
+                  <i 
+                    className="fas fa-heart" 
+                    aria-hidden="true"
+                    style={{
+                      color: isLiked ? '#ff3860' : '#3273dc'
+                    }}
+                    ></i>
+                </span>
+                <span style={{fontSize: '0.9rem'}}>
+                  {likeCount}
                 </span>
               </a>
           </nav>
