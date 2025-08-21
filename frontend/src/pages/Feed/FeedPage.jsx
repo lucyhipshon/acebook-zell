@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import { getPosts } from "../../services/posts";
 import Post from "../../components/Post";
-
 import {CreatePostForm} from "../../components/CreatePostForm";
 import { Navbar } from "../../components/Navbar";
+import CommentsModal from "../../components/CommentsModal";
 import { SortPosts } from "../../components/SortPosts";
+
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
+  const [activePost, setActivePost] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -73,11 +74,26 @@ export function FeedPage() {
       <SortPosts/>
       <div className="feed" role="feed">
         {sortedPosts.map((post) => (
-           post._id && (
-          <Post post={post} key={post._id} currentUser={currentUser} onDelete={fetchPosts} />
-        )
-        ))}
+         post._id && (
+        <Post 
+           post={post} 
+           key={post._id} 
+           currentUser={currentUser} 
+           onDelete={fetchPosts}
+           onOpenComments={() => setActivePost(post)}
+       />
+    )
+    ))}
       </div>
+      <CommentsModal
+        isActive={activePost}
+        post={activePost}
+        onClose={() => setActivePost(null)}
+      />
+      <LogoutButton />
+      <Footer/>
+      </div>
+
     </div>
   );
 }
