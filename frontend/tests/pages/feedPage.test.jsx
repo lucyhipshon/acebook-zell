@@ -41,7 +41,10 @@ describe("Feed Page", () => {
         profileImage: "/uploads/alice.jpg"          
       },
       createdAt: "2025-08-11T16:36:15.000Z",
-      updatedAt: "2025-08-11T16:36:15.000Z",  
+      updatedAt: "2025-08-11T16:36:15.000Z",
+      likesCount: 0,
+      likedByCurrentUser: false
+  
 
   }];
 
