@@ -32,7 +32,7 @@ export function LoginPage() {
     try {
       const token = await login(email, password);
       localStorage.setItem("token", token);
-      navigate("/profile");
+      navigate("/quacks");
     } catch (err) {
       console.error(err.message);
       setSubmitError(err.message || "An unexpected error occurred. Please try again.");

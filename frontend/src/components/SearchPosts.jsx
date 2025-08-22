@@ -40,7 +40,6 @@ export function SearchPosts() {
             
             try {
                 const response = await searchPosts(token, searchTerm);
-                
                 setResults(response.posts || []);
             } catch (err) {
                 setError(err.message);
@@ -51,28 +50,30 @@ export function SearchPosts() {
     }, [searchTerm, navigate]);
 
     return (
-        <div>
+        <div className="section">
             <Navbar />
-            <div>
-                <p>
-                    {searchTerm ? `Search Results for "${searchTerm}"` : 'Search Posts'}
-                </p>                
+            <div className="container mt-5">
                 {searchTerm ? (
                     results.length > 0 ? (
-                        <div className="search-results">
-                            {results.map(post => (
-                                post._id && (
-                                    <div key={post._id} className="box mb-4">
-                                        <Post 
-                                            post={post} 
-                                            currentUser={currentUser}
-                                        />
-                                    </div>
-                                )
-                            ))}
-                        </div>
+                        <>
+                            <p className="has-text-weight-medium">
+                                {searchTerm ? `Search Results for "${searchTerm}"` : 'Search Posts'}
+                            </p>  
+                            <div className="search-results">
+                                {results.map(post => (
+                                    post._id && (
+                                        <div key={post._id}>
+                                            <Post 
+                                                post={post} 
+                                                currentUser={currentUser}
+                                            />
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+                        </>
                     ) : (
-                        <div>
+                        <div className="has-text-weight-medium">
                             <p>No posts found for "{searchTerm}"</p>
                         </div>
                     )
