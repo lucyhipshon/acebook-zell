@@ -6,7 +6,7 @@ import {CreatePostForm} from "../../components/CreatePostForm";
 import { Navbar } from "../../components/Navbar";
 import CommentsModal from "../../components/CommentsModal";
 import { SortPosts } from "../../components/SortPosts";
-
+import { Footer } from "../../components/Footer";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -90,6 +90,7 @@ export function FeedPage() {
         post={activePost}
         onClose={() => setActivePost(null)}
       />
+      <Footer/>
       </div>
   );
 }
