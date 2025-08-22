@@ -1,6 +1,6 @@
 import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
 import { useState } from "react";
+import { Footer } from "../../components/Footer";
 
 export function AboutPage() {
   const [openFeature, setOpenFeature] = useState(null);
@@ -37,7 +37,7 @@ export function AboutPage() {
   ];
 
   return (
-    <div>
+    <div className="section">
       <Navbar />
       <div className="container mt-5">
         <div className="columns is-centered">
@@ -218,7 +218,6 @@ export function AboutPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

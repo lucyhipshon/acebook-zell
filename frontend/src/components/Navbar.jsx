@@ -54,7 +54,7 @@ export function Navbar() {
                     <Link to="/createquack" className={`navbar-item ${isProfile ? "active" : ""}`}>
                         Create a Quack
                     </Link>
-                    <Link to="/quackers" className={`navbar-item ${isUsers ? "active" : ""}`}>
+                    <Link to="/quackers " className={`navbar-item ${isUsers ? "active" : ""}`}>
                         Find friends
                     </Link>
                     </div>

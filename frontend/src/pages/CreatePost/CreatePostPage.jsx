@@ -5,9 +5,9 @@ import { Navbar } from "../../components/Navbar"
 export function CreatePostPage() {
     const navigate = useNavigate()
     return (
-        <>
+        <div style={{height: "100vh"}}>
             <Navbar/>
-            <CreatePostForm onPostCreated={() => navigate("/posts")}/>
-        </>
+            <CreatePostForm onPostCreated={() => navigate("/quacks")}/>
+        </div>
     )
 }
