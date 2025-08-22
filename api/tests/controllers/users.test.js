@@ -215,7 +215,7 @@ describe("/users", () => {
     });
   });
 
-  // background image tests
+  // // background image tests
   describe("POST /users/upload-background/:userId", () => {
     let user;
 
