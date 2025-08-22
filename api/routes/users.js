@@ -19,7 +19,7 @@ const tokenChecker = require('../middleware/tokenChecker');
 
 router.get('/profile', tokenChecker, async (req, res) => {
     try {
-        const user = await User.findById(req.user_id).select('firstName lastName bio profileImage backgroundImage'); // this is where to add db fields if needed in ProfilePage.jsx
+        const user = await User.findById(req.user_id).select('firstName lastName bio profileImage backgroundImage email job location relationshipStatus'); // this is where to add db fields if needed in ProfilePage.jsx
         
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
@@ -53,6 +53,11 @@ router.post('/upload-background/:userId', upload.single('backgroundImage'), asyn
       { backgroundImage: filePath },
       { new: true }
     );
+
+    if (!updatedUser) {
+      console.log('User not found for ID:', userId);
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     console.log('User updated:', updatedUser);
 

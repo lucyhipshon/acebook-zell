@@ -3,7 +3,7 @@ const Post = require("../models/post");
 const { generateToken } = require("../lib/token");
 
 async function getAllPosts(req, res) {
-   const searchTerm = req.query.q;
+  const searchTerm = req.query.q;
 
   let query = {}; 
   if (searchTerm) {
@@ -184,6 +184,28 @@ async function unlikePost(req, res) {
   });
 }
 
+
+// new function for getting all posts by a logged in user
+async function getMyPosts(req, res) {
+  console.log("req.user_id:", req.user_id);
+  try {
+    if (!req.user_id) {
+      console.error("No user_id found on request");
+      return res.status(400).json({message: "User ID missing from request"});
+    }
+
+    const posts = await Post.find({ author: req.user_id })
+      .sort({ createdAt: -1});
+    
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error('Failed to get user posts:', err);
+    res.status(500).json({ message: 'Failed to get user posts'});
+  }
+};
+
+
+
 const PostsController = {
   getAllPosts: getAllPosts,
   createPost: createPost,
@@ -191,6 +213,7 @@ const PostsController = {
   deletePostById: deletePostById,
   likePost: likePost,
   unlikePost: unlikePost,
+  getMyPosts: getMyPosts,
 };
 
 module.exports = PostsController;

@@ -618,4 +618,72 @@ describe("/posts", () => {
       });
     });
   });
+
+
+  //
+  describe("GET /posts/me", () => {
+    test("responds with a 200 and the user's posts", async () => {
+      const post1 = new Post({
+        message: "Post 1",
+        author: user._id,
+      });
+      const post2 = new Post({
+        message: "Post 2",
+        author: user._id,
+      });
+
+      await post1.save();
+      await post2.save();
+
+      const response = await request(app)
+        .get("/posts/me")
+        .set("Authorization", `Bearer ${token}`);
+
+      console.log("Response body from /posts/me:", response.body);
+
+      expect(response.status).toEqual(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(2);
+      expect(response.body[0].author).toEqual(user._id.toString());
+    });
+
+
+    test("returns only posts belonging to the user", async () => {
+      // Create a post by another user
+      const otherUser = new User({
+        firstName: "Other",
+        lastName: "User",
+        email: "otheruser@example.com",
+        password: "password123",
+      });
+      await otherUser.save();
+
+      await Post.create({ message: "Other user's post", author: otherUser._id });
+
+      await Post.create({ message: "My post", author: user._id });
+
+      const response = await request(app)
+        .get("/posts/me")
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.body.find(post => post.message === "Other user's post")).toBeUndefined();
+      expect(response.body.every(post => post.author === user._id.toString())).toBe(true);
+    });
+
+    test("returns 401 if no token is provided", async () => {
+      const response = await request(app).get("/posts/me");
+
+      expect(response.status).toEqual(401);
+      expect(response.body.message).toMatch(/auth error/i);
+    });
+
+    test("returns 401 if token is invalid", async () => {
+      const response = await request(app)
+        .get("/posts/me")
+        .set("Authorization", `Bearer invalidtoken`);
+
+      expect(response.status).toEqual(401);
+      expect(response.body.message).toMatch(/auth error/i);
+    });
+  });
 });
