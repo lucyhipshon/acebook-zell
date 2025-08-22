@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import { login } from "../../services/authentication";
+import { Footer } from "../../components/Footer";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -85,37 +86,38 @@ export function LoginPage() {
           </div>
           <div className="field">
             <p className="control has-icons-left has-icons-right">
-              <input
-                className={`input is-link ${passwordError ? 'is-danger' : ''}`}
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={handlePasswordChange}
-              />
-              <span className="icon is-small is-left">
-                <i className="fas fa-lock"></i>
-              </span>
-            </p>
-            {passwordError && <p className="help is-danger">{passwordError}</p>}
-          </div>
-          <div className="field">
-            <p className="control">
-              <button className="button is-link is-fullwidth is-linked is-focused">
-                Log in
-              </button>
-            </p>
-          </div>
-          <p>Don't have an account yet? Please{' '} 
-            <Link to="/signup" className="has-text-link">
-              sign up
-            </Link> 
-            {' '}and join the Quack community!</p>
-        </form>
+                <input
+                  className={`input is-link ${passwordError ? 'is-danger' : ''}`}
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+                  <span className="icon is-small is-left">
+                    <i className="fas fa-lock"></i>
+                  </span>
+                </p>
+                  {passwordError && <p className="help is-danger">{passwordError}</p>}
+                </div>
+                <div className="field">
+                  <p className="control">
+                    <button className="button is-link is-fullwidth is-linked is-focused">
+                      Log in
+                    </button>
+                  </p>
+                </div>
+                <p>Don't have an account yet? Please{' '} 
+                  <Link to="/signup" className="has-text-link">
+                    sign up
+                  </Link> 
+                  {' '}and join the Quack community!
+                </p>
+              </form>
+            </div>
+          </div>      
         </div>
-      </div>      
-    </div>
-    </div>
+      </div>
     </div>
   );
 }
