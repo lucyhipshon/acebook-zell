@@ -98,6 +98,8 @@ function Post(props) {
 
 
 return (
+  <div className="section">
+    <div className="container">
   <article className="card mb-4" key={props.post._id}>
     {/* Header Section */}
     <div className="card-content pb-2">
@@ -213,6 +215,8 @@ return (
       </div>
     </div>
   </article>
+  </div>
+  </div>
 );
 
 }
