@@ -11,6 +11,7 @@ import { NotFoundPage } from "./pages/NotFoundPage/NotFoundPage";
 import { AboutPage } from "./pages/About/AboutPage";
 
 
+
 // docs: https://reactrouter.com/en/main/start/overview
 const router = createBrowserRouter([
   {
