@@ -148,7 +148,7 @@ const ProfilePage = () => {
     <>
       <Navbar />
 
-      <div style={{ backgroundColor: '#d4d8ffff', minHeight: '100vh', paddingBottom: '50px' }}>
+      <div style={{ minHeight: '100vh', paddingBottom: '50px' }}>
         
         {/* All profile page content goes here */}
         
