@@ -6,7 +6,7 @@ import {CreatePostForm} from "../../components/CreatePostForm";
 import { Navbar } from "../../components/Navbar";
 import CommentsModal from "../../components/CommentsModal";
 import { SortPosts } from "../../components/SortPosts";
-
+import { Footer } from "../../components/Footer";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -74,14 +74,14 @@ export function FeedPage() {
       <SortPosts/>
       <div className="feed" role="feed">
         {sortedPosts.map((post) => (
-          post._id && (
+         post._id && (
         <Post 
-            post={post} 
-            key={post._id} 
-            currentUser={currentUser} 
-            onDelete={fetchPosts}
-            onOpenComments={() => setActivePost(post)}
-        />
+           post={post} 
+           key={post._id} 
+           currentUser={currentUser} 
+           onDelete={fetchPosts}
+           onOpenComments={() => setActivePost(post)}
+       />
     )
     ))}
       </div>
@@ -90,6 +90,7 @@ export function FeedPage() {
         post={activePost}
         onClose={() => setActivePost(null)}
       />
+      <Footer/>
       </div>
   );
 }

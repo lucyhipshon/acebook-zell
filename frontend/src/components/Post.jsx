@@ -98,8 +98,9 @@ function Post(props) {
 
 
 return (
-  <article className="card" key={props.post._id}>
-    <div className="card-content">
+  <article className="card mb-4" key={props.post._id}>
+    {/* Header Section */}
+    <div className="card-content pb-2">
       <div className="media">
         <div className="media-left">
           <figure className="image is-48x48">
@@ -108,10 +109,6 @@ return (
                   if (!props.post.author?.profileImage) {
                     return 'http://localhost:3000/uploads/default.jpg';
                   }
-                  // This is the change that fixed the bug - Handles inconsistent slashing (/) in profileImage paths
-                  // Saw this on the ProfilePage component
-                  // If profileImage path has slash - use as is / if it doesn't - add it
-                  // Uses a ternary operator e.g. const variable = condition ? valueIfTrue : valueIfFalse;
                   const profileImagePath = props.post.author.profileImage.startsWith('/') 
                     ? props.post.author.profileImage 
                     : '/' + props.post.author.profileImage;
@@ -128,75 +125,96 @@ return (
           </figure>
         </div>
         <div className="media-content">
-            <p className="title is-4 has-text-left">{getDisplayName(props.post.author)}</p>
-            <small className="is-pulled-right has-text-black hover-text-primary has-text-weight-light">{formatTimeAgo(props.post.createdAt)}</small>
+            <p className="title is-5 has-text-left mb-1">{getDisplayName(props.post.author)}</p>
+            <small className="has-text-grey">{formatTimeAgo(props.post.createdAt)}</small>
         </div>
-    </div>
-    <div className="content has-text-left">
-      <p className="has-text-black hover-text-primary has-text-weight-normal">{props.post.message}</p>
-      <br />
-
-    </div>
-
-    <nav className="level is-pulled-right">
-          <a 
-            className="level-item is-pulled-right"
-            aria-label="open comments"
-            onClick={props.onOpenComments}
-          >
-            <span className="icon is-small">
-              <i className="fa-solid fa-comment" aria-hidden="true"></i>
-            </span>
-          </a>
-          <a className="level-item" aria-label="like">
-            <span className="icon is-small">
-              <i className="fas fa-heart" aria-hidden="true"></i>
-            </span>
-          </a>
-      </nav>
+      </div>
+      
+      {/* Content Section */}
+      <div className="content has-text-left mt-3">
+        <p className="has-text-black">{props.post.message}</p>
+      </div>
     </div>
 
-    <nav className="level is-pulled-right">
-              <a className="level-item is-pulled-right" aria-label="reply">
-                <span className="icon is-small">
-                  <i className="fa-solid fa-comment" aria-hidden="true"></i>
-                </span>
-              </a>
-              <a className="level-item"
-                  aria-label="like"
-                  onClick={handleLikeClick}
-                  style={{cursor:"pointer"}}
-                  >
-                <span className="icon is-small" style={{ marginRight: '4px' }}>
-                  <i 
-                    className="fas fa-heart" 
-                    aria-hidden="true"
-                    style={{
-                      color: isLiked ? '#ff3860' : '#3273dc'
-                    }}
-                    ></i>
-                </span>
-                <span style={{fontSize: '0.9rem'}}>
-                  {likeCount}
-                </span>
-              </a>
-          </nav>
+    {/* Image Section - Better Desktop Sizing */}
+    {props.post.image && (
+      <div className="card-image">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          padding: '0 1rem' // Add some padding on sides
+        }}>
+          <figure className="image" style={{ maxWidth: '600px', width: '100%' }}>
+            <img 
+              src={props.post.image} 
+              alt={`Image for post by ${getDisplayName(props.post.author)}`}
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxHeight: '400px', // Reduced from 500px
+                objectFit: 'contain', // Changed from 'cover' to 'contain'
+                display: 'block',
+                borderRadius: '8px' // Add slight rounding
+              }}
+            />
+          </figure>
+        </div>
+      </div>
+    )}
 
-        {/* Post attachment images */}
-        {props.post.image && (
-          <div className="card-image">
-            <figure className="image is-4by3">
-              <img src={props.post.image} alt={`Image for ${props.post.image}`}/>
-            </figure> 
+    {/* Actions Footer - Responsive */}
+    <div className="card-content pt-3 pb-3">
+      <div className="level is-mobile"> {/* is-mobile keeps level working on mobile */}
+        <div className="level-left">
+          <div className="level-item">
+            <a 
+              aria-label="like"
+              onClick={handleLikeClick}
+              style={{cursor:"pointer"}}
+              className="has-text-link"
+            >
+              <span className="icon is-small" style={{ marginRight: '4px' }}>
+                <i 
+                  className="fas fa-heart" 
+                  aria-hidden="true"
+                  style={{
+                    color: isLiked ? '#ff3860' : '#3273dc'
+                  }}
+                />
+              </span>
+              <span style={{fontSize: '0.9rem'}}>
+                {likeCount}
+              </span>
+            </a>
           </div>
-        )}
-
-        {/* Delete Post Button */}
-        <div className="media-right">
-          <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+          
+          <div className="level-item">
+            <a 
+              aria-label="open comments"
+              onClick={props.onOpenComments}
+              style={{cursor:"pointer"}}
+              className="has-text-link"
+            >
+              <span className="icon is-small" style={{ marginRight: '4px' }}>
+                <i className="fa-solid fa-comment" aria-hidden="true"></i>
+              </span>
+              <span className="is-hidden-mobile" style={{fontSize: '0.9rem'}}>
+                Comments
+              </span>
+            </a>
+          </div>
         </div>
-      </article>
-    );
+        
+        <div className="level-right">
+          <div className="level-item">
+            <DeletePost post={props.post} currentUser={props.currentUser} onDelete={props.onDelete}/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+);
+
 }
 
 export default Post;

@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {useState} from "react";
 import LogoutButton from "./LogoutButton";
-// import "./Navbar.css";
 
 export function Navbar() {
     const { pathname } = useLocation();
@@ -21,17 +20,18 @@ export function Navbar() {
         event.preventDefault();
         if (searchTerm.trim()){
             navigate(`/search?term=${encodeURIComponent(searchTerm)}`);
+            setSearchTerm('');
         }
     }
 
     return (
-        <nav className="navbar is-link" role="navigation" aria-label="main navigation">
+        <nav className="navbar is-link is-fixed-top" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-                <Link to="/posts" className="navbar-item">
+                <Link to="/quacks" className="navbar-item">
                     <img
-                        src="https://img2.annthegran.com/printart/xlarge/fsl_studio/pgfsl1771.webp"
+                        src="/rubber_duck_navbar.gif"
                         alt="Quackbook duck logo"
-                        className="logo"
+                        className="image is-32x32"
                     />
                     <span className="name is-size-3 has-text-weight-extrabold">QuackBook</span>
                 </Link>
@@ -51,10 +51,10 @@ export function Navbar() {
                         <Link to="/profile" className={`navbar-item ${isProfile ? "active" : ""}`}>
                         Profile
                     </Link>
-                    <Link to="/createpost" className={`navbar-item ${isProfile ? "active" : ""}`}>
+                    <Link to="/createquack" className={`navbar-item ${isProfile ? "active" : ""}`}>
                         Create a Quack
                     </Link>
-                    <Link to="/users" className={`navbar-item ${isUsers ? "active" : ""}`}>
+                    <Link to="/quackers" className={`navbar-item ${isUsers ? "active" : ""}`}>
                         Find friends
                     </Link>
                     </div>
@@ -62,14 +62,17 @@ export function Navbar() {
                     <div className="navbar-item">
                         <form onSubmit={handleSearch}>
                             <div className="field has-addons">
-                                <div className="control">
+                                <div className="control has-icons-right">
                                     <input
                                         className="input is-link"
                                         type="text"
-                                        placeholder="Search posts..."
+                                        placeholder="Search quacks..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
+                                    <span className="icon is-small is-right">
+                                        <i className="fa-solid fa-magnifying-glass"></i>
+                                    </span>
                                 </div>
                             </div>
                         </form>

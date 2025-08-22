@@ -2,8 +2,8 @@ import { useState } from "react";
 import {useNavigate} from "react-router-dom" 
 import { createPost } from "../services/posts";
 
-export function CreatePostForm(props) {
 
+export function CreatePostForm(props) {
     const [message, setMessage] = useState("");
     const [submitError, setSubmitError] = useState("");
     const [image, setImage] = useState(null); // Store selected image
@@ -32,13 +32,11 @@ export function CreatePostForm(props) {
                 setSubmitError("Please select an image file");
                 return;
             }
-
             // Validate file size (limit to 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 setSubmitError("Image must be smaller than 5MB");
                 return;
             }
-
             setImage(file);
             
             // Create preview URL
@@ -70,7 +68,6 @@ export function CreatePostForm(props) {
     });
     }
 
-
     async function handleSubmit(e) {
         e.preventDefault();
         console.log("Submitting: ", message, image ? "with image" : "without image");
@@ -93,107 +90,102 @@ export function CreatePostForm(props) {
             if (image) {
                 postData.image = await readFileAsDataURL(image) // await base64 conversion
             }
-
             // Call service function (needs token and message data - see function sig in service for context)
             await createPost(token, postData);
             props.onPostCreated(postData);
             setImage(null)
             setImagePreview(null)
-            setMessage("") //clear the form for the feed page after submitting
-            
+            setMessage("") //clear the form for the feed page after submitting     
         } catch (err) {
             console.error(err) // for devs - error in browser console
-            setSubmitError("Failed to create post. Please try again."); // for user - stay on the page and show the error
-
-            
+            setSubmitError("Failed to create post. Please try again."); // for user - stay on the page and show the error 
         }
     }
 
     return (
-        <form className="box" onSubmit={handleSubmit}>
-            {/* Message input field */}
-            <div className="field">
-                <label className="label is-flex is-justify-content-space-between is-size-4 has-text-weight-extrabold has-text-link">
-                    New Quack <span className="has-text-grey-light is-size-6">({count}/{maxLength})</span>
-                </label>
-                <div className="control">
-                    <textarea 
-                    // condtional styling using a ternary operator - red border around if error exists (e.g. api call failed)
-                        className={submitError ? 'textarea is-danger' : 'textarea'}   // ternary operator --> if condition : if true : if false 
-                        id="post-message"  
-                        rows={5}
-                        value={message}
-                        onChange={handleChange}
-                        maxLength={maxLength}
-                        placeholder="Say something..."
-                    />
+        <div className="section">
+            <div className="container">
+                <form className="box" onSubmit={handleSubmit}>
+                    {/* Message input field */}
+                    <div className="field">
+                        <label className="label is-flex is-justify-content-space-between is-size-4 has-text-weight-extrabold has-text-link">
+                            New Quack <span className="has-text-grey-light is-size-6">({count}/{maxLength})</span>
+                        </label>
+                        <div className="control">
+                            <textarea 
+                            // condtional styling using a ternary operator - red border around if error exists (e.g. api call failed)
+                                className={submitError ? 'textarea is-danger' : 'textarea'}   // ternary operator --> if condition : if true : if false 
+                                id="post-message"  
+                                rows={5}
+                                value={message}
+                                onChange={handleChange}
+                                maxLength={maxLength}
+                                placeholder="Quack something..."
+                            />
+                        </div>
+                        {/* Conditional error message: only shows if submitError has content */}
+                        {submitError && <p className="help is-danger">{submitError}</p>}
+                    </div>
+                    {/* Image upload field */}
+                    <div className="field">
+                        <div className="file has-name is-link">
+                            <label className="file-label">
+                                <input 
+                                    className="file-input" 
+                                    type="file" 
+                                    id="image-upload"
+                                    onChange={handleImageChange} 
+                                    accept="image/*" 
+                            />
+                            <span className="file-cta">
+                                <span className="file-icon">
+                                    <i className="fas fa-upload"></i>
+                                </span>
+                                <span className="file-label">
+                                    Choose a file...
+                                </span>
+                            </span>
+                            {image && (
+                                <span className="file-name">
+                                    {image.name}
+                                </span>
+                            )}
+                        </label>
+                    </div>
                 </div>
-                {/* Conditional error message: only shows if submitError has content */}
-                {submitError && <p className="help is-danger">{submitError}</p>}
-            </div>
-            {/* Image upload field */}
-            <div className="field">
-                <label className="label">Attach Image</label>
-                <div className="file has-name is-link">
-                    <label className="file-label">
-                        <input 
-                            className="file-input" 
-                            type="file" 
-                            id="image-upload"
-                            onChange={handleImageChange} 
-                            accept="image/*" 
-                    />
-                    <span className="file-cta">
-                        <span className="file-icon">
-                            <i className="fas fa-upload"></i>
-                        </span>
-                        <span className="file-label">
-                            Choose a file...
-                        </span>
-                    </span>
-                    <span className="file-name">
-                        {image ? image.name : "No file selected"}
-                    </span>
-                </label>
-            </div>
+                {/* Image Preview */}
+                {imagePreview && (
+                    <div className="preview-container">
+                            <figure className="image is-128x128">
+                                <img 
+                                    src={imagePreview} 
+                                    alt="Preview" 
+                                    style={{ objectFit: 'cover' }}
+                                />
+                            </figure>
+                            <button 
+                                type="button" 
+                                className="button is-small is-link is-pulled-left mt-6"
+                                onClick={handleRemoveImage}
+                            >
+                                Remove Image
+                            </button>
+                        </div>
+                )}
+                {/* Submit button */}
+                <div className="field">
+                    <div className="control is-flex is-justify-content-flex-end">
+                        <button 
+                            type="submit" 
+                            className="button is-link mb-1"
+                            disabled={isEmpty}>
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-
-        {/* Image Preview */}
-        {imagePreview && (
-            <div className="field">
-                <label className="label">Image Preview</label>
-                <div className="box">
-                    <figure className="image is-128x128">
-                        <img 
-                            src={imagePreview} 
-                            alt="Preview" 
-                            style={{ objectFit: 'cover' }}
-                        />
-                    </figure>
-                    <button 
-                        type="button" 
-                        className="button is-small is-danger mt-2"
-                        onClick={handleRemoveImage}
-                    >
-                        Remove Image
-                    </button>
-                </div>
-            </div>
-        )}
-
-
-            {/* Submit button */}
-            <div className="field">
-                <div className="control">
-                    <button 
-                        type="submit" 
-                        className="button is-link"
-                        disabled={isEmpty}>
-                        Submit
-                    </button>
-                </div>
-            </div>
-        </form>
+      </div>
     );
 }
 
