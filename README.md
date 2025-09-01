@@ -72,6 +72,10 @@ If you haven't already, make sure you have node and NVM installed.
    ```
    brew services start mongodb-community@6.0
    ```
+7.5 *NOTE to view the database, you will need to start a new connection in TablePlus and select "MongoDB", use this link: MONGODB_URL="mongodb://0.0.0.0/acebook"
+and then name your database "acebook"
+LIKEWISE, for running the tests, a test database "acebook_test" is contained within the project and will run when the tests run, to run the tests for api: npm test, to run the tests for frontend: npm run test
+
 
 ### Setting up environment variables.
 
